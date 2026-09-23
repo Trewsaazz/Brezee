@@ -12,4 +12,33 @@
     <FirebirdKitDir>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)..\third_party\firebird\$(FirebirdVersion)'))</FirebirdKitDir>
     <FirebirdIncludeDir>$(FirebirdKitDir)include\</FirebirdIncludeDir>
   </PropertyGroup>
+  <!--
+    Files shipped next to Brezee.exe: the client (fbclient + firebird.msg for error texts) and the
+    embedded engine with its dependencies (ICU, character sets, time zones, UDR support), so local
+    database files open without a server. The Visual C++ runtime DLLs in the kit are deliberately
+    not shipped: Brezee's own build needs a newer runtime than Firebird's copies.
+  -->
+  <ItemGroup>
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)fbclient.dll" Link="fbclient.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)firebird.msg" Link="firebird.msg" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)firebird.conf" Link="firebird.conf" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)zlib1.dll" Link="zlib1.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)ib_util.dll" Link="ib_util.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)icudt63.dll" Link="icudt63.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)icudt63l.dat" Link="icudt63l.dat" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)icuin63.dll" Link="icuin63.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)icuuc63.dll" Link="icuuc63.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)intl\fbintl.dll" Link="intl\fbintl.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)intl\fbintl.conf" Link="intl\fbintl.conf" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)plugins\engine13.dll" Link="plugins\engine13.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)plugins\chacha.dll" Link="plugins\chacha.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)plugins\udr_engine.dll" Link="plugins\udr_engine.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)plugins\udr_engine.conf" Link="plugins\udr_engine.conf" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)plugins\udr\udf_compat.dll" Link="plugins\udr\udf_compat.dll" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)tzdata\ids.dat" Link="tzdata\ids.dat" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)tzdata\metaZones.res" Link="tzdata\metaZones.res" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)tzdata\timezoneTypes.res" Link="tzdata\timezoneTypes.res" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)tzdata\windowsZones.res" Link="tzdata\windowsZones.res" />
+    <FirebirdRuntimeFile Include="$(FirebirdKitDir)tzdata\zoneinfo64.res" Link="tzdata\zoneinfo64.res" />
+  </ItemGroup>
 </Project>

@@ -24,3 +24,15 @@ public sealed class NotEmptyToVisibilityConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();
 }
+
+// Collapsed for true, visible for false: hides controls that do not apply in a mode.
+public sealed class TrueToCollapsedConverter : IValueConverter
+{
+    public static TrueToCollapsedConverter Instance { get; } = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is true ? Visibility.Collapsed : Visibility.Visible;
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}

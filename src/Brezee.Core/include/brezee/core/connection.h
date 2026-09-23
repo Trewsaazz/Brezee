@@ -9,7 +9,8 @@ namespace brezee::core {
 // Everything needed to attach to a Firebird database. Strings are UTF-8.
 struct ConnectionParameters
 {
-    // Server host name or IP. Empty opens the database locally (embedded, no server needed).
+    // Server host name or IP. Empty opens the database file directly with the embedded engine,
+    // even if a Firebird server runs on this machine (use "localhost" to go through that server).
     std::string host;
     std::uint16_t port = 3050;
 

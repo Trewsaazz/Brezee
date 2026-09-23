@@ -31,6 +31,11 @@ Firebird::IXpbBuilder* build_dpb(Status& status, const ConnectionParameters& par
     if (!parameters.charset.empty())
         dpb->insertString(status.get(), isc_dpb_lc_ctype, parameters.charset.c_str());
 
+    // Without a host, always use the embedded engine. Otherwise fbclient would first try a Firebird
+    // server running on this machine, which behaves differently (passwords, file locks).
+    if (parameters.host.empty())
+        dpb->insertString(status.get(), isc_dpb_config, "Providers=Engine13");
+
     return dpb;
 }
 

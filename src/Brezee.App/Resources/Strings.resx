@@ -95,6 +95,24 @@ ODS {2}.{3} · {4} byte pages</value>
   <data name="Connect_Title" xml:space="preserve">
     <value>Connect to Database</value>
   </data>
+  <data name="Connect_ModeServer" xml:space="preserve">
+    <value>Firebird _server</value>
+  </data>
+  <data name="Connect_ModeLocal" xml:space="preserve">
+    <value>_Local database file</value>
+  </data>
+  <data name="Connect_LocalDatabaseHint" xml:space="preserve">
+    <value>A .fdb file on this computer. Brezee opens it directly with its built-in Firebird engine; no server is needed.</value>
+  </data>
+  <data name="Connect_Browse" xml:space="preserve">
+    <value>_Browse…</value>
+  </data>
+  <data name="Connect_BrowseTitle" xml:space="preserve">
+    <value>Open Database File</value>
+  </data>
+  <data name="Connect_BrowseFilter" xml:space="preserve">
+    <value>Firebird databases (*.fdb;*.gdb)|*.fdb;*.gdb|All files (*.*)|*.*</value>
+  </data>
   <data name="Connect_Server" xml:space="preserve">
     <value>_Server</value>
   </data>

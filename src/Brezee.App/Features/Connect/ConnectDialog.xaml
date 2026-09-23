@@ -37,6 +37,15 @@
     </Window.Resources>
 
     <StackPanel Margin="20">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,12"
+                    IsEnabled="{Binding IsBusy, Converter={x:Static local:InverseBooleanConverter.Instance}}">
+            <RadioButton Margin="0,0,20,0"
+                         Content="{x:Static res:Strings.Connect_ModeServer}"
+                         IsChecked="{Binding IsLocal, Converter={x:Static local:InverseBooleanConverter.Instance}}" />
+            <RadioButton Content="{x:Static res:Strings.Connect_ModeLocal}"
+                         IsChecked="{Binding IsLocal}" />
+        </StackPanel>
+
         <Grid IsEnabled="{Binding IsBusy, Converter={x:Static local:InverseBooleanConverter.Instance}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -53,14 +62,28 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Target="{Binding ElementName=HostBox}" Content="{x:Static res:Strings.Connect_Server}" />
-            <TextBox Grid.Row="0" Grid.Column="1" x:Name="HostBox" Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}" />
-            <Label Grid.Row="0" Grid.Column="2" Margin="12,0,0,0" Target="{Binding ElementName=PortBox}" Content="{x:Static res:Strings.Connect_Port}" />
-            <TextBox Grid.Row="0" Grid.Column="3" x:Name="PortBox" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" />
+            <!-- Server and port only apply to server connections. -->
+            <Label Grid.Row="0" Target="{Binding ElementName=HostBox}" Content="{x:Static res:Strings.Connect_Server}"
+                   Visibility="{Binding IsLocal, Converter={x:Static local:TrueToCollapsedConverter.Instance}}" />
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="HostBox" Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}"
+                     Visibility="{Binding IsLocal, Converter={x:Static local:TrueToCollapsedConverter.Instance}}" />
+            <Label Grid.Row="0" Grid.Column="2" Margin="12,0,0,0" Target="{Binding ElementName=PortBox}" Content="{x:Static res:Strings.Connect_Port}"
+                   Visibility="{Binding IsLocal, Converter={x:Static local:TrueToCollapsedConverter.Instance}}" />
+            <TextBox Grid.Row="0" Grid.Column="3" x:Name="PortBox" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}"
+                     Visibility="{Binding IsLocal, Converter={x:Static local:TrueToCollapsedConverter.Instance}}" />
 
             <Label Grid.Row="1" Target="{Binding ElementName=DatabaseBox}" Content="{x:Static res:Strings.Connect_Database}" />
-            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" x:Name="DatabaseBox" Text="{Binding Database, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Hint}" Text="{x:Static res:Strings.Connect_DatabaseHint}" />
+            <DockPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3">
+                <Button DockPanel.Dock="Right" Margin="8,4,0,4" Padding="10,0"
+                        Content="{x:Static res:Strings.Connect_Browse}"
+                        Click="OnBrowse"
+                        Visibility="{Binding IsLocal, Converter={StaticResource BoolToVisibility}}" />
+                <TextBox x:Name="DatabaseBox" Text="{Binding Database, UpdateSourceTrigger=PropertyChanged}" />
+            </DockPanel>
+            <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Hint}" Text="{x:Static res:Strings.Connect_DatabaseHint}"
+                       Visibility="{Binding IsLocal, Converter={x:Static local:TrueToCollapsedConverter.Instance}}" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Style="{StaticResource Hint}" Text="{x:Static res:Strings.Connect_LocalDatabaseHint}"
+                       Visibility="{Binding IsLocal, Converter={StaticResource BoolToVisibility}}" />
 
             <Label Grid.Row="3" Target="{Binding ElementName=UserBox}" Content="{x:Static res:Strings.Connect_User}" />
             <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" x:Name="UserBox" Text="{Binding User, UpdateSourceTrigger=PropertyChanged}" />

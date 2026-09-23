@@ -50,6 +50,19 @@ public class ConnectDialogViewModelTests
     }
 
     [Fact]
+    public void LocalMode_LeavesHostEmptySoTheEmbeddedEngineIsUsed()
+    {
+        _dialog.IsLocal = true;
+        _dialog.Host = "db.example.com"; // Ignored in local mode.
+        _dialog.Database = @"C:\Data\employee.fdb";
+
+        var settings = _dialog.ToSettings();
+
+        Assert.Equal(string.Empty, settings.Host);
+        Assert.Equal(@"C:\Data\employee.fdb", settings.Database);
+    }
+
+    [Fact]
     public async Task Connect_Success_ExposesSessionAndRaisesConnected()
     {
         _dialog.Database = "employee";

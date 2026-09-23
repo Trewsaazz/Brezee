@@ -23,6 +23,10 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
         Charset = "UTF8";
     }
 
+    // True to open a database file on this computer with the embedded engine, no server needed.
+    [ObservableProperty]
+    public partial bool IsLocal { get; set; }
+
     [ObservableProperty]
     public partial string Host { get; set; }
 
@@ -61,7 +65,7 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
 
     public ConnectionSettings ToSettings() => new()
     {
-        Host = Host.Trim(),
+        Host = IsLocal ? string.Empty : Host.Trim(),
         Port = Port,
         Database = Database.Trim(),
         User = User.Trim(),

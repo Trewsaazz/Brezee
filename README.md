@@ -87,7 +87,7 @@ MIT-licensed and non-profit. Built by the community, for the community.
 Brezee is at the very beginning of its journey. These are the core ideas guiding it. The
 detailed plan lives in the [roadmap](roadmap.md), and this section will grow as features land.
 
-- 🔌 **Connections**: simple, reliable connection management for local and remote Firebird servers
+- 🔌 **Connections**: connect to Firebird servers, or open a local `.fdb` file directly with the built-in engine
 - 🗂️ **Exploration**: browse databases, tables, views, procedures, and other objects at a glance
 - ✍️ **Querying**: a comfortable SQL editor for writing and running queries
 - 📊 **Results**: clear, fast presentation of query results

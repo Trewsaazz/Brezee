@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using Brezee.App.Resources;
+using Microsoft.Win32;
 
 namespace Brezee.App.Features.Connect;
 
@@ -21,6 +23,19 @@ public partial class ConnectDialog : Window
             e.Cancel = true;
 
         base.OnClosing(e);
+    }
+
+    private void OnBrowse(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = Strings.Connect_BrowseTitle,
+            Filter = Strings.Connect_BrowseFilter,
+            CheckFileExists = true,
+        };
+
+        if (dialog.ShowDialog(this) == true)
+            _viewModel.Database = dialog.FileName;
     }
 
     private void OnPasswordChanged(object sender, RoutedEventArgs e) =>
