@@ -39,6 +39,9 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\Brezee.Core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <!-- C4679: C++/CLI cannot import .NET 7+ static abstract interface members (Parse/TryParse on
+           numeric types). Harmless, and raised for any code that touches the BCL. -->
+      <DisableSpecificWarnings>4679;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
