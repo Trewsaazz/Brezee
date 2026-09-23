@@ -15,7 +15,7 @@ public sealed class ExplorerViewModelTests : IDisposable
     public void Dispose() => _temp.Dispose();
 
     private ExplorerViewModel CreateExplorer() =>
-        new(_connections, _temp.Saved, new ConnectionCoordinator(_dialogs, _connections, _temp.Saved));
+        new(_connections, _temp.Saved, TestData.Coordinator(_dialogs, _connections, _temp.Saved));
 
     [Fact]
     public void StartsEmpty()
@@ -75,7 +75,7 @@ public sealed class ExplorerViewModelTests : IDisposable
     }
 
     [Fact]
-    public void Connect_OnSavedNode_AsksForTheRestThroughTheDialog()
+    public async Task Connect_OnSavedNode_AsksForTheRestThroughTheDialog()
     {
         var saved = TestData.Saved();
         _temp.Saved.Add(saved);
@@ -84,7 +84,7 @@ public sealed class ExplorerViewModelTests : IDisposable
         var node = explorer.Databases[0];
 
         Assert.True(explorer.ConnectCommand.CanExecute(node));
-        explorer.ConnectCommand.Execute(node);
+        await explorer.ConnectCommand.ExecuteAsync(node);
 
         Assert.Same(saved, Assert.Single(_dialogs.ConnectDialogPrefills));
         Assert.True(node.IsConnected);
@@ -169,5 +169,23 @@ public sealed class ExplorerViewModelTests : IDisposable
         var node = Assert.Single(explorer.Databases);
         Assert.True(node.IsSaved);
         Assert.True(node.IsConnected);
+    }
+
+    [Fact]
+    public void ForgetPassword_IsOfferedOnlyForARememberedPassword()
+    {
+        _temp.Saved.Add(TestData.Saved("Plain"));
+        _temp.Saved.Add(TestData.Saved("Remembered") with { ProtectedPassword = "protected:secret" });
+        var explorer = CreateExplorer();
+        var plain = explorer.Databases.Single(n => n.Name == "Plain");
+        var remembered = explorer.Databases.Single(n => n.Name == "Remembered");
+
+        Assert.False(explorer.ForgetPasswordCommand.CanExecute(plain));
+        Assert.True(explorer.ForgetPasswordCommand.CanExecute(remembered));
+
+        explorer.ForgetPasswordCommand.Execute(remembered);
+
+        Assert.False(remembered.HasSavedPassword);
+        Assert.Null(_temp.Store.Load().Single(c => c.Name == "Remembered").ProtectedPassword);
     }
 }

@@ -12,7 +12,7 @@ public class ConnectDialogViewModelTests
 
     public ConnectDialogViewModelTests()
     {
-        _dialog = new ConnectDialogViewModel(_connector);
+        _dialog = new ConnectDialogViewModel(_connector, new FakeProtector());
     }
 
     [Fact]
@@ -160,6 +160,53 @@ public class ConnectDialogViewModelTests
         Assert.Equal("CLERK", _dialog.Role);
         Assert.Equal("WIN1252", _dialog.Charset);
         Assert.Equal(string.Empty, _dialog.Password);
+        Assert.Null(_dialog.CreateSavedConnection());
+    }
+
+    [Fact]
+    public void RememberPassword_OnANewSavedConnection_StoresItEncrypted()
+    {
+        _dialog.Database = "employee";
+        _dialog.Password = "secret";
+        _dialog.SaveConnection = true;
+        _dialog.RememberPassword = true;
+
+        Assert.Equal("protected:secret", _dialog.CreateSavedConnection()?.ProtectedPassword);
+    }
+
+    [Fact]
+    public void RememberPassword_OnAnExistingConnection_UpdatesIt()
+    {
+        var saved = new SavedConnection { Name = "Employee", Database = "employee" };
+        _dialog.LoadFrom(saved);
+        _dialog.Password = "new-secret";
+        _dialog.RememberPassword = true;
+
+        var updated = _dialog.CreateSavedConnection();
+
+        Assert.Equal(saved.Id, updated?.Id);
+        Assert.Equal("protected:new-secret", updated?.ProtectedPassword);
+    }
+
+    [Fact]
+    public void UntickingRememberPassword_ForgetsTheStoredOne()
+    {
+        var saved = new SavedConnection { Name = "Employee", Database = "employee", ProtectedPassword = "protected:old" };
+        _dialog.LoadFrom(saved);
+        Assert.True(_dialog.RememberPassword); // Pre-ticked because a password is stored.
+
+        _dialog.RememberPassword = false;
+
+        Assert.Null(_dialog.CreateSavedConnection()?.ProtectedPassword);
+        Assert.NotNull(_dialog.CreateSavedConnection());
+    }
+
+    [Fact]
+    public void ExistingConnection_WithNothingToRemember_IsNotUpdated()
+    {
+        _dialog.LoadFrom(new SavedConnection { Name = "Employee", Database = "employee" });
+        _dialog.Password = "typed-but-not-remembered";
+
         Assert.Null(_dialog.CreateSavedConnection());
     }
 }

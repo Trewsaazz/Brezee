@@ -28,6 +28,7 @@ public sealed partial class ExplorerViewModel : ToolViewModel
 
         _saved.Added += (_, connection) => OnSaved(connection);
         _saved.Removed += (_, connection) => OnUnsaved(connection);
+        _saved.Updated += (_, connection) => OnSavedUpdated(connection);
         _connections.Added += (_, active) => OnConnected(active);
         _connections.Removed += (_, active) => OnDisconnected(active);
         Databases.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasDatabases));
@@ -36,7 +37,7 @@ public sealed partial class ExplorerViewModel : ToolViewModel
     public ObservableCollection<DatabaseNodeViewModel> Databases { get; } = [];
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ConnectCommand), nameof(DisconnectCommand), nameof(RemoveCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ConnectCommand), nameof(DisconnectCommand), nameof(RemoveCommand), nameof(ForgetPasswordCommand))]
     public partial DatabaseNodeViewModel? SelectedDatabase { get; set; }
 
     public bool HasDatabases => Databases.Count > 0;
@@ -44,13 +45,26 @@ public sealed partial class ExplorerViewModel : ToolViewModel
     // Commands act on the node passed in (context menu, double-click) or else the selected one.
     private DatabaseNodeViewModel? Target(DatabaseNodeViewModel? node) => node ?? SelectedDatabase;
 
-    private bool CanConnect(DatabaseNodeViewModel? node) => Target(node) is { IsSaved: true, IsConnected: false };
+    private bool CanConnect(DatabaseNodeViewModel? node) =>
+        Target(node) is { IsSaved: true, IsConnected: false, IsConnecting: false };
 
-    [RelayCommand(CanExecute = nameof(CanConnect))]
-    private void Connect(DatabaseNodeViewModel? node)
+    [RelayCommand(CanExecute = nameof(CanConnect), AllowConcurrentExecutions = true)]
+    private async Task ConnectAsync(DatabaseNodeViewModel? node)
     {
-        if (Target(node)?.Saved is { } saved)
-            _coordinator.Connect(saved);
+        if (Target(node) is not { Saved: { } saved } target)
+            return;
+
+        target.IsConnecting = true;
+        RefreshCommands();
+        try
+        {
+            await _coordinator.ConnectAsync(saved);
+        }
+        finally
+        {
+            target.IsConnecting = false;
+            RefreshCommands();
+        }
     }
 
     private bool CanDisconnect(DatabaseNodeViewModel? node) => Target(node) is { IsConnected: true };
@@ -60,6 +74,15 @@ public sealed partial class ExplorerViewModel : ToolViewModel
     {
         if (Target(node)?.Active is { } active)
             _connections.Disconnect(active);
+    }
+
+    private bool CanForgetPassword(DatabaseNodeViewModel? node) => Target(node) is { HasSavedPassword: true };
+
+    [RelayCommand(CanExecute = nameof(CanForgetPassword))]
+    private void ForgetPassword(DatabaseNodeViewModel? node)
+    {
+        if (Target(node)?.Saved is { } saved)
+            _coordinator.ForgetPassword(saved);
     }
 
     private bool CanRemove(DatabaseNodeViewModel? node) => Target(node) is { IsSaved: true };
@@ -85,9 +108,17 @@ public sealed partial class ExplorerViewModel : ToolViewModel
         RefreshCommands();
     }
 
+    private void OnSavedUpdated(SavedConnection connection)
+    {
+        if (Databases.FirstOrDefault(n => n.Saved?.Id == connection.Id) is { } node)
+            node.Saved = connection;
+
+        RefreshCommands();
+    }
+
     private void OnUnsaved(SavedConnection connection)
     {
-        var node = Databases.FirstOrDefault(n => n.Saved == connection);
+        var node = Databases.FirstOrDefault(n => n.Saved?.Id == connection.Id);
         if (node is null)
             return;
 
@@ -137,5 +168,6 @@ public sealed partial class ExplorerViewModel : ToolViewModel
         ConnectCommand.NotifyCanExecuteChanged();
         DisconnectCommand.NotifyCanExecuteChanged();
         RemoveCommand.NotifyCanExecuteChanged();
+        ForgetPasswordCommand.NotifyCanExecuteChanged();
     }
 }

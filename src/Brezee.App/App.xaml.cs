@@ -76,6 +76,7 @@ public partial class App : Application
 
         // Connections
         services.AddSingleton<IDatabaseConnector, FirebirdConnector>();
+        services.AddSingleton<ICredentialProtector, DpapiCredentialProtector>();
         services.AddSingleton<ConnectionManager>();
         services.AddSingleton(provider =>
             new ConnectionStore(ConnectionStore.DefaultPath, provider.GetRequiredService<ILogger<ConnectionStore>>()));

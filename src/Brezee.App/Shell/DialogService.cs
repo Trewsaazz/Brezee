@@ -4,13 +4,14 @@ using Brezee.App.Features.Connect;
 
 namespace Brezee.App.Shell;
 
-public sealed class DialogService(IDatabaseConnector connector) : IDialogService
+public sealed class DialogService(IDatabaseConnector connector, ICredentialProtector protector) : IDialogService
 {
-    public ConnectResult? ShowConnectDialog(SavedConnection? prefill)
+    public ConnectResult? ShowConnectDialog(SavedConnection? prefill, string? error = null)
     {
-        var viewModel = new ConnectDialogViewModel(connector);
+        var viewModel = new ConnectDialogViewModel(connector, protector);
         if (prefill is not null)
             viewModel.LoadFrom(prefill);
+        viewModel.ErrorMessage = error;
 
         var dialog = new ConnectDialog(viewModel) { Owner = Application.Current.MainWindow };
         if (dialog.ShowDialog() != true || viewModel.Session is null)

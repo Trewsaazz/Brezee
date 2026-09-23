@@ -26,7 +26,7 @@ public sealed class ShellViewModelTests : IDisposable
     public ShellViewModelTests()
     {
         _loggerFactory = _logs.CreateFactory();
-        var coordinator = new ConnectionCoordinator(_dialogs, _connections, _temp.Saved);
+        var coordinator = TestData.Coordinator(_dialogs, _connections, _temp.Saved);
         _explorer = new ExplorerViewModel(_connections, _temp.Saved, coordinator);
         _shell = new ShellViewModel(_commands, coordinator, _explorer, _output,
             _loggerFactory.CreateLogger<ShellViewModel>());

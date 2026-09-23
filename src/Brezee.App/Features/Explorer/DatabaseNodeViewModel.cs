@@ -15,8 +15,13 @@ public sealed partial class DatabaseNodeViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Name), nameof(Location), nameof(IsSaved), nameof(Details))]
+    [NotifyPropertyChangedFor(nameof(Name), nameof(Location), nameof(IsSaved), nameof(HasSavedPassword), nameof(Details))]
     public partial SavedConnection? Saved { get; set; }
+
+    // True while a connect attempt for this database is running.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Status))]
+    public partial bool IsConnecting { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Name), nameof(Location), nameof(IsConnected), nameof(Status), nameof(Details))]
@@ -25,6 +30,8 @@ public sealed partial class DatabaseNodeViewModel : ObservableObject
     public bool IsSaved => Saved is not null;
 
     public bool IsConnected => Active is not null;
+
+    public bool HasSavedPassword => Saved?.HasSavedPassword == true;
 
     // The saved name, or the database file name for an unsaved connection.
     public string Name => Saved?.Name ?? DatabaseNames.FromPath(Active?.Session.Settings.Database ?? string.Empty);
@@ -44,8 +51,9 @@ public sealed partial class DatabaseNodeViewModel : ObservableObject
         }
     }
 
-    // The server version when connected, otherwise "not connected".
-    public string Status => Active?.Session.Details.ServerVersion ?? Strings.Explorer_NotConnected;
+    // The server version when connected, otherwise "connecting…" or "not connected".
+    public string Status => Active?.Session.Details.ServerVersion
+        ?? (IsConnecting ? Strings.Explorer_Connecting : Strings.Explorer_NotConnected);
 
     // Tooltip: the full path plus server details when connected.
     public string Details

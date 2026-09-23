@@ -54,11 +54,23 @@ public sealed class FakeDialogService : IDialogService
 
     public List<SavedConnection?> ConnectDialogPrefills { get; } = [];
 
-    public ConnectResult? ShowConnectDialog(SavedConnection? prefill)
+    public List<string?> ConnectDialogErrors { get; } = [];
+
+    public ConnectResult? ShowConnectDialog(SavedConnection? prefill, string? error = null)
     {
         ConnectDialogPrefills.Add(prefill);
+        ConnectDialogErrors.Add(error);
         return ConnectResult;
     }
+}
+
+// Reversible stand-in for DPAPI, so tests can see what would be stored.
+public sealed class FakeProtector : ICredentialProtector
+{
+    public string Protect(string password) => "protected:" + password;
+
+    public string? Unprotect(string protectedPassword) =>
+        protectedPassword.StartsWith("protected:", StringComparison.Ordinal) ? protectedPassword["protected:".Length..] : null;
 }
 
 // A SavedConnections backed by a temporary file, deleted on dispose.
@@ -85,6 +97,10 @@ public sealed class TempSavedConnections : IDisposable
 
 public static class TestData
 {
+    public static ConnectionCoordinator Coordinator(
+        IDialogService dialogs, ConnectionManager connections, SavedConnections saved, IDatabaseConnector? connector = null) =>
+        new(dialogs, connector ?? new FakeConnector(), new FakeProtector(), connections, saved);
+
     public static SavedConnection Saved(string name = "Employee", string database = "C:/data/employee.fdb", string host = "localhost") =>
         new() { Name = name, Database = database, Host = host, IsLocal = host.Length == 0 };
 }

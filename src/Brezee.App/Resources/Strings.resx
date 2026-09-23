@@ -48,6 +48,9 @@
   <data name="Command_RemoveSaved" xml:space="preserve">
     <value>_Remove from List</value>
   </data>
+  <data name="Command_ForgetPassword" xml:space="preserve">
+    <value>_Forget Password</value>
+  </data>
   <data name="Command_Disconnect" xml:space="preserve">
     <value>_Disconnect</value>
   </data>
@@ -78,6 +81,9 @@
   </data>
   <data name="Explorer_NotConnected" xml:space="preserve">
     <value>not connected</value>
+  </data>
+  <data name="Explorer_Connecting" xml:space="preserve">
+    <value>connecting…</value>
   </data>
   <data name="Explorer_Local" xml:space="preserve">
     <value>local</value>
@@ -150,7 +156,13 @@ ODS {2}.{3} · {4} byte pages</value>
     <value>_Save this connection as</value>
   </data>
   <data name="Connect_SaveAsHint" xml:space="preserve">
-    <value>Name shown in the Database Explorer. Leave empty to use the database file name. Passwords are not saved.</value>
+    <value>Name shown in the Database Explorer. Leave empty to use the database file name.</value>
+  </data>
+  <data name="Connect_RememberPassword" xml:space="preserve">
+    <value>Re_member password</value>
+  </data>
+  <data name="Connect_RememberPasswordHint" xml:space="preserve">
+    <value>The password is encrypted with Windows (DPAPI) so only your Windows account on this computer can use it.</value>
   </data>
   <data name="Connect_Connect" xml:space="preserve">
     <value>_Connect</value>

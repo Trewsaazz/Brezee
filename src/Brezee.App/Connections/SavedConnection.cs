@@ -1,9 +1,10 @@
+using System.Text.Json.Serialization;
 using Brezee.Bridge;
 
 namespace Brezee.App.Connections;
 
 // A registered database: everything needed to connect again, under a name the user chose.
-// Passwords are not part of it (see the roadmap item on secure credential storage).
+// The password is only kept if the user asked, and then only encrypted (see ICredentialProtector).
 public sealed record SavedConnection
 {
     public Guid Id { get; init; } = Guid.NewGuid();
@@ -24,6 +25,12 @@ public sealed record SavedConnection
     public string Role { get; init; } = string.Empty;
 
     public string Charset { get; init; } = "UTF8";
+
+    // The remembered password, encrypted with ICredentialProtector. Null when not remembered.
+    public string? ProtectedPassword { get; init; }
+
+    [JsonIgnore]
+    public bool HasSavedPassword => ProtectedPassword is not null;
 
     public ConnectionSettings ToSettings(string password) => new()
     {

@@ -40,11 +40,23 @@ public sealed class ConnectionStoreTests : IDisposable
     }
 
     [Fact]
-    public void Save_WritesNoPassword()
+    public void Save_WithoutRememberedPassword_WritesNoPasswordField()
     {
         Store.Save([TestData.Saved()]);
 
-        Assert.DoesNotContain("password", File.ReadAllText(Store.FilePath), StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("password\": \"", File.ReadAllText(Store.FilePath), StringComparison.OrdinalIgnoreCase);
+        Assert.Null(Assert.Single(Store.Load()).ProtectedPassword);
+    }
+
+    [Fact]
+    public void Save_KeepsOnlyTheProtectedFormOfARememberedPassword()
+    {
+        Store.Save([TestData.Saved() with { ProtectedPassword = new DpapiCredentialProtector().Protect("hunter2") }]);
+
+        var json = File.ReadAllText(Store.FilePath);
+        Assert.DoesNotContain("hunter2", json);
+        Assert.DoesNotContain("hasSavedPassword", json);
+        Assert.Equal("hunter2", new DpapiCredentialProtector().Unprotect(Assert.Single(Store.Load()).ProtectedPassword!));
     }
 
     [Fact]

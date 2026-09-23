@@ -9,10 +9,13 @@ namespace Brezee.App.Features.Connect;
 public sealed partial class ConnectDialogViewModel : ObservableObject
 {
     private readonly IDatabaseConnector _connector;
+    private readonly ICredentialProtector _protector;
+    private SavedConnection? _prefill;
 
-    public ConnectDialogViewModel(IDatabaseConnector connector)
+    public ConnectDialogViewModel(IDatabaseConnector connector, ICredentialProtector protector)
     {
         _connector = connector;
+        _protector = protector;
 
         Host = "localhost";
         Port = 3050;
@@ -58,9 +61,13 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
     [ObservableProperty]
     public partial string ConnectionName { get; set; }
 
-    // True when the dialog was opened for an existing saved connection, so there is nothing to save.
+    // True when the dialog was opened for an existing saved connection.
     [ObservableProperty]
     public partial bool IsForSavedConnection { get; private set; }
+
+    // Whether to keep the password, encrypted for the current Windows user.
+    [ObservableProperty]
+    public partial bool RememberPassword { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
@@ -79,7 +86,9 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
     // Pre-fills the form from a saved connection; only the password is left to enter.
     public void LoadFrom(SavedConnection connection)
     {
+        _prefill = connection;
         IsForSavedConnection = true;
+        RememberPassword = connection.HasSavedPassword;
         ConnectionName = connection.Name;
         IsLocal = connection.IsLocal;
         Host = connection.Host;
@@ -90,10 +99,22 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
         Charset = connection.Charset;
     }
 
-    // The saved connection to create, if the user asked for one. Never includes the password.
+    // What to store after a successful connect: a new saved connection if the user asked for one, an
+    // update of the pre-filled one if its remembered password changed, or null. The password is only
+    // ever included encrypted.
     public SavedConnection? CreateSavedConnection()
     {
-        if (!SaveConnection || IsForSavedConnection)
+        var protectedPassword = RememberPassword && Password.Length > 0 ? _protector.Protect(Password) : null;
+
+        if (_prefill is { } prefill)
+        {
+            // Store the newly typed password, or forget the old one if the box was unticked.
+            if (protectedPassword is not null || (!RememberPassword && prefill.HasSavedPassword))
+                return prefill with { ProtectedPassword = protectedPassword };
+            return null;
+        }
+
+        if (!SaveConnection)
             return null;
 
         var settings = ToSettings();
@@ -107,6 +128,7 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
             User = settings.User,
             Role = settings.Role,
             Charset = settings.Charset,
+            ProtectedPassword = protectedPassword,
         };
     }
 

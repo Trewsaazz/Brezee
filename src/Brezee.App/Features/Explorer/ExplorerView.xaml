@@ -82,6 +82,9 @@
                                           Command="{Binding PlacementTarget.Tag.DisconnectCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           CommandParameter="{Binding}" />
                                 <Separator />
+                                <MenuItem Header="{x:Static res:Strings.Command_ForgetPassword}"
+                                          Command="{Binding PlacementTarget.Tag.ForgetPasswordCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandParameter="{Binding}" />
                                 <MenuItem Header="{x:Static res:Strings.Command_RemoveSaved}"
                                           Command="{Binding PlacementTarget.Tag.RemoveCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           CommandParameter="{Binding}" />

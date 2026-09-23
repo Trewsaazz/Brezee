@@ -22,6 +22,9 @@ public sealed class SavedConnections
 
     public event EventHandler<SavedConnection>? Removed;
 
+    // Raised with the new version after Update; the old one is replaced (same Id).
+    public event EventHandler<SavedConnection>? Updated;
+
     public SavedConnection? Find(Guid id) => _items.FirstOrDefault(c => c.Id == id);
 
     public void Add(SavedConnection connection)
@@ -32,9 +35,21 @@ public sealed class SavedConnections
         Added?.Invoke(this, connection);
     }
 
+    // Replaces the saved connection with the same Id.
+    public void Update(SavedConnection connection)
+    {
+        var index = _items.FindIndex(c => c.Id == connection.Id);
+        if (index < 0)
+            throw new InvalidOperationException($"No saved connection with id {connection.Id}.");
+
+        _items[index] = connection;
+        Persist();
+        Updated?.Invoke(this, connection);
+    }
+
     public void Remove(SavedConnection connection)
     {
-        if (!_items.Remove(connection))
+        if (_items.RemoveAll(c => c.Id == connection.Id) == 0)
             return;
 
         Persist();
