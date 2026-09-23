@@ -1,4 +1,5 @@
 using System.Windows;
+using Brezee.App.Commands;
 using Brezee.App.Features.Explorer;
 using Brezee.App.Features.Output;
 using Brezee.App.Shell;
@@ -32,6 +33,7 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         // Shell
+        services.AddSingleton<CommandRegistry>();
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<MainWindow>();
 

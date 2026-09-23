@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
         xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
+        xmlns:avalonDockConverters="clr-namespace:AvalonDock.Converters;assembly=AvalonDock"
+        xmlns:commands="clr-namespace:Brezee.App.Commands"
         xmlns:avalonDockThemes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2013"
         xmlns:shell="clr-namespace:Brezee.App.Shell"
         mc:Ignorable="d"
@@ -14,7 +16,33 @@
         MinWidth="640" MinHeight="400"
         WindowStartupLocation="CenterScreen">
 
+    <Window.Resources>
+        <avalonDockConverters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+
+        <!-- Menu items bound to an AppCommand take their text and shortcut from it. -->
+        <Style TargetType="{x:Type MenuItem}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Command, RelativeSource={RelativeSource Self}, Converter={x:Static commands:IsAppCommandConverter.Instance}}" Value="True">
+                    <Setter Property="Header" Value="{Binding Command.Text, RelativeSource={RelativeSource Self}}" />
+                    <Setter Property="InputGestureText" Value="{Binding Command.GestureText, RelativeSource={RelativeSource Self}}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Command="{Binding Commands[file.exit]}" />
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Command="{Binding Commands[view.explorer]}" />
+                <MenuItem Command="{Binding Commands[view.output]}" />
+                <Separator />
+                <MenuItem Command="{Binding Commands[view.welcome]}" />
+            </MenuItem>
+        </Menu>
+
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="Ready" />
             <StatusBarItem HorizontalAlignment="Right"
@@ -41,6 +69,9 @@
                             <Setter Property="Title" Value="{Binding Model.Title}" />
                             <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
                             <Setter Property="CanClose" Value="False" />
+                            <Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}" />
+                            <Setter Property="Visibility"
+                                    Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibility}, ConverterParameter={x:Static Visibility.Hidden}}" />
                         </Style>
                     </shell:PaneStyleSelector.ToolStyle>
                     <shell:PaneStyleSelector.DocumentStyle>

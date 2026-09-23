@@ -20,7 +20,7 @@ Nothing here is set in stone — phases can reorder, and some items may get cut 
 
 ### Application shell
 
-- [ ] Main window shell with dockable panels (AvalonDock) from day one
+- [x] Main window shell with dockable panels (AvalonDock) from day one
 - [ ] Central command system (menus, toolbars, and shortcuts all route through it)
 - [ ] All UI strings in resource files from the start, so localization is possible later
 
