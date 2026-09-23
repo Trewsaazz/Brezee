@@ -35,7 +35,7 @@ Nothing here is set in stone — phases can reorder, and some items may get cut 
 
 ## Phase 1 — Core Browsing & Data Editing
 
-- [ ] Database Explorer — object tree for tables, views, stored procedures, triggers, generators/sequences, domains, exceptions, UDFs, roles, indices
+- [x] Database Explorer — object tree for tables, views, stored procedures, functions, packages, triggers, generators/sequences, domains, exceptions, roles, indices
 - [ ] Table data grid — browse, sort, filter rows
 - [ ] Inline data editing (insert/update/delete rows) with commit/rollback
 - [ ] Blob viewer/editor (text, image, binary preview)
