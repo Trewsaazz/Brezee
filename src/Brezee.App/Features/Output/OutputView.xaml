@@ -1,0 +1,8 @@
+<UserControl x:Class="Brezee.App.Features.Output.OutputView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ListBox ItemsSource="{Binding Lines}"
+             BorderThickness="0"
+             FontFamily="Cascadia Mono, Consolas, Courier New"
+             FontSize="12" />
+</UserControl>

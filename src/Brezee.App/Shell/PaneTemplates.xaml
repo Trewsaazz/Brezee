@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:explorer="clr-namespace:Brezee.App.Features.Explorer"
+                    xmlns:output="clr-namespace:Brezee.App.Features.Output"
+                    xmlns:welcome="clr-namespace:Brezee.App.Features.Welcome">
+
+    <!-- Maps each pane view model to its view. Add one entry per new panel or document type. -->
+
+    <DataTemplate DataType="{x:Type explorer:ExplorerViewModel}">
+        <explorer:ExplorerView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type output:OutputViewModel}">
+        <output:OutputView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type welcome:WelcomeViewModel}">
+        <welcome:WelcomeView />
+    </DataTemplate>
+
+</ResourceDictionary>
