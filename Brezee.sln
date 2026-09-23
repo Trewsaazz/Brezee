@@ -3,11 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.0.0.0
 MinimumVisualStudioVersion = 17.0.0.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D632B6FB-1D1F-4FCF-B421-02D7E4FA266A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FA7811B0-F322-4114-9A02-D0F71626694A}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Brezee.Core", "src\Brezee.Core\Brezee.Core.vcxproj", "{BEB86CE3-0A52-49D1-BB84-19AB19668940}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Brezee.Bridge", "src\Brezee.Bridge\Brezee.Bridge.vcxproj", "{45DA8A2F-5D10-48C4-BEBE-6EE572E337E4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Brezee.App", "src\Brezee.App\Brezee.App.csproj", "{782317D8-5CFC-401C-9623-FEEFF82D30A7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Brezee.Core.Tests", "tests\Brezee.Core.Tests\Brezee.Core.Tests.vcxproj", "{493E4F7D-9751-4104-8680-B2E1A2FAF58F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Brezee.App.Tests", "tests\Brezee.App.Tests\Brezee.App.Tests.csproj", "{DBACF6FB-940A-42E3-9B4F-4B7CB90EFDDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,8 +35,23 @@ Global
 		{782317D8-5CFC-401C-9623-FEEFF82D30A7}.Debug|x64.Build.0 = Debug|x64
 		{782317D8-5CFC-401C-9623-FEEFF82D30A7}.Release|x64.ActiveCfg = Release|x64
 		{782317D8-5CFC-401C-9623-FEEFF82D30A7}.Release|x64.Build.0 = Release|x64
+		{493E4F7D-9751-4104-8680-B2E1A2FAF58F}.Debug|x64.ActiveCfg = Debug|x64
+		{493E4F7D-9751-4104-8680-B2E1A2FAF58F}.Debug|x64.Build.0 = Debug|x64
+		{493E4F7D-9751-4104-8680-B2E1A2FAF58F}.Release|x64.ActiveCfg = Release|x64
+		{493E4F7D-9751-4104-8680-B2E1A2FAF58F}.Release|x64.Build.0 = Release|x64
+		{DBACF6FB-940A-42E3-9B4F-4B7CB90EFDDE}.Debug|x64.ActiveCfg = Debug|x64
+		{DBACF6FB-940A-42E3-9B4F-4B7CB90EFDDE}.Debug|x64.Build.0 = Debug|x64
+		{DBACF6FB-940A-42E3-9B4F-4B7CB90EFDDE}.Release|x64.ActiveCfg = Release|x64
+		{DBACF6FB-940A-42E3-9B4F-4B7CB90EFDDE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BEB86CE3-0A52-49D1-BB84-19AB19668940} = {D632B6FB-1D1F-4FCF-B421-02D7E4FA266A}
+		{45DA8A2F-5D10-48C4-BEBE-6EE572E337E4} = {D632B6FB-1D1F-4FCF-B421-02D7E4FA266A}
+		{782317D8-5CFC-401C-9623-FEEFF82D30A7} = {D632B6FB-1D1F-4FCF-B421-02D7E4FA266A}
+		{493E4F7D-9751-4104-8680-B2E1A2FAF58F} = {FA7811B0-F322-4114-9A02-D0F71626694A}
+		{DBACF6FB-940A-42E3-9B4F-4B7CB90EFDDE} = {FA7811B0-F322-4114-9A02-D0F71626694A}
 	EndGlobalSection
 EndGlobal

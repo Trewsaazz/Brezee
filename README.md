@@ -136,7 +136,20 @@ Or build from a *Developer PowerShell for VS 2026*:
 msbuild Brezee.sln -restore -p:Configuration=Release -p:Platform=x64
 ```
 
-Every push is also built by [GitHub Actions](.github/workflows/build.yml), which uploads a
+**Run the tests**
+
+```powershell
+./eng/run-tests.ps1 -Configuration Release
+```
+
+| Suite | Framework | Covers |
+| ----- | --------- | ------ |
+| `tests/Brezee.Core.Tests` | [doctest](https://github.com/doctest/doctest) | Native C++ core |
+| `tests/Brezee.App.Tests` | [xUnit v3](https://xunit.net/) | View models and commands, plus the C++/CLI bridge end to end |
+
+Both suites also show up in Visual Studio's Test Explorer.
+
+Every push is built and tested by [GitHub Actions](.github/workflows/build.yml), which uploads a
 ready-to-run build as an artifact.
 
 ---
