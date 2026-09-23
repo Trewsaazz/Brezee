@@ -14,9 +14,9 @@ Nothing here is set in stone — phases can reorder, and some items may get cut 
 ### Project groundwork
 
 - [x] Solution scaffolding — native C++ core, C++/CLI bridge, WPF app
-- [ ] Build setup and CI (build + tests on every push)
-- [ ] Logging and centralized error handling (core → bridge → UI)
-- [ ] Unit test projects for the core and the app
+- [x] Build setup and CI (build + tests on every push)
+- [x] Logging and centralized error handling (core → bridge → UI)
+- [x] Unit test projects for the core and the app
 
 ### Application shell
 

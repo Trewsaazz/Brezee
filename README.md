@@ -147,7 +147,8 @@ msbuild Brezee.sln -restore -p:Configuration=Release -p:Platform=x64
 | `tests/Brezee.Core.Tests` | [doctest](https://github.com/doctest/doctest) | Native C++ core |
 | `tests/Brezee.App.Tests` | [xUnit v3](https://xunit.net/) | View models and commands, plus the C++/CLI bridge end to end |
 
-Both suites also show up in Visual Studio's Test Explorer.
+The xUnit suite also shows up in Visual Studio's Test Explorer. The doctest suite is a plain
+executable (`x64\<Configuration>\Brezee.Core.Tests.exe`), so set it as the startup project to debug it.
 
 Every push is built and tested by [GitHub Actions](.github/workflows/build.yml), which uploads a
 ready-to-run build as an artifact.
