@@ -21,6 +21,7 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
         Password = string.Empty;
         Role = string.Empty;
         Charset = "UTF8";
+        ConnectionName = string.Empty;
     }
 
     // True to open a database file on this computer with the embedded engine, no server needed.
@@ -49,6 +50,18 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
     [ObservableProperty]
     public partial string Charset { get; set; }
 
+    // Whether to remember these details as a saved connection after connecting.
+    [ObservableProperty]
+    public partial bool SaveConnection { get; set; }
+
+    // Name for the saved connection. Blank means "use the database file name".
+    [ObservableProperty]
+    public partial string ConnectionName { get; set; }
+
+    // True when the dialog was opened for an existing saved connection, so there is nothing to save.
+    [ObservableProperty]
+    public partial bool IsForSavedConnection { get; private set; }
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
     public partial bool IsBusy { get; set; }
@@ -62,6 +75,40 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
 
     // Raised after a successful connect so the view can close.
     public event EventHandler? Connected;
+
+    // Pre-fills the form from a saved connection; only the password is left to enter.
+    public void LoadFrom(SavedConnection connection)
+    {
+        IsForSavedConnection = true;
+        ConnectionName = connection.Name;
+        IsLocal = connection.IsLocal;
+        Host = connection.Host;
+        Port = connection.Port;
+        Database = connection.Database;
+        User = connection.User;
+        Role = connection.Role;
+        Charset = connection.Charset;
+    }
+
+    // The saved connection to create, if the user asked for one. Never includes the password.
+    public SavedConnection? CreateSavedConnection()
+    {
+        if (!SaveConnection || IsForSavedConnection)
+            return null;
+
+        var settings = ToSettings();
+        return new SavedConnection
+        {
+            Name = string.IsNullOrWhiteSpace(ConnectionName) ? DatabaseNames.FromPath(settings.Database) : ConnectionName.Trim(),
+            IsLocal = IsLocal,
+            Host = settings.Host,
+            Port = settings.Port,
+            Database = settings.Database,
+            User = settings.User,
+            Role = settings.Role,
+            Charset = settings.Charset,
+        };
+    }
 
     public ConnectionSettings ToSettings() => new()
     {

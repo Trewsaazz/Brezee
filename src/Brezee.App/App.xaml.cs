@@ -77,6 +77,10 @@ public partial class App : Application
         // Connections
         services.AddSingleton<IDatabaseConnector, FirebirdConnector>();
         services.AddSingleton<ConnectionManager>();
+        services.AddSingleton(provider =>
+            new ConnectionStore(ConnectionStore.DefaultPath, provider.GetRequiredService<ILogger<ConnectionStore>>()));
+        services.AddSingleton<SavedConnections>();
+        services.AddSingleton<ConnectionCoordinator>();
 
         // Shell
         services.AddSingleton<CommandRegistry>();

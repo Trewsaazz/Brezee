@@ -2,48 +2,62 @@ using Microsoft.Extensions.Logging;
 
 namespace Brezee.App.Connections;
 
+// An open session, and the saved connection it was opened from (if any).
+public sealed class ActiveConnection(IDatabaseSession session, Guid? savedConnectionId)
+{
+    public IDatabaseSession Session { get; } = session;
+
+    public Guid? SavedConnectionId { get; } = savedConnectionId;
+}
+
 // Owns every open database session. Several databases can be open at the same time.
 public sealed class ConnectionManager(ILogger<ConnectionManager> logger) : IDisposable
 {
-    private readonly List<IDatabaseSession> _sessions = [];
+    private readonly List<ActiveConnection> _connections = [];
 
-    public IReadOnlyList<IDatabaseSession> Sessions => _sessions;
+    public IReadOnlyList<ActiveConnection> Connections => _connections;
 
-    public event EventHandler<IDatabaseSession>? SessionAdded;
+    public event EventHandler<ActiveConnection>? Added;
 
-    public event EventHandler<IDatabaseSession>? SessionRemoved;
+    public event EventHandler<ActiveConnection>? Removed;
 
-    public void Add(IDatabaseSession session)
+    public ActiveConnection? FindBySavedConnection(Guid savedConnectionId) =>
+        _connections.FirstOrDefault(c => c.SavedConnectionId == savedConnectionId);
+
+    public ActiveConnection Add(IDatabaseSession session, Guid? savedConnectionId = null)
     {
-        _sessions.Add(session);
+        var connection = new ActiveConnection(session, savedConnectionId);
+        _connections.Add(connection);
         logger.LogInformation("Connected to {Database} ({Server})",
             session.Settings.Database, session.Details.ServerVersion);
-        SessionAdded?.Invoke(this, session);
+        Added?.Invoke(this, connection);
+        return connection;
     }
 
-    public void Disconnect(IDatabaseSession session)
+    public void Disconnect(ActiveConnection connection)
     {
-        if (!_sessions.Remove(session))
+        if (!_connections.Remove(connection))
             return;
 
-        SessionRemoved?.Invoke(this, session);
+        Removed?.Invoke(this, connection);
 
+        var settings = connection.Session.Settings;
         try
         {
-            session.Dispose();
-            logger.LogInformation("Disconnected from {Database}", session.Settings.Database);
+            connection.Session.Dispose();
+            logger.LogInformation("Disconnected from {Database}", settings.Database);
         }
         catch (Exception ex)
         {
             // A failed disconnect must not stop the others from closing.
-            logger.LogWarning(ex, "Error while disconnecting from {Database}", session.Settings.Database);
+            logger.LogWarning(ex, "Error while disconnecting from {Database}", settings.Database);
         }
     }
 
     // Disconnects everything, e.g. when the app exits. Safe to call more than once.
     public void Dispose()
     {
-        foreach (var session in _sessions.ToList())
-            Disconnect(session);
+        foreach (var connection in _connections.ToList())
+            Disconnect(connection);
     }
 }

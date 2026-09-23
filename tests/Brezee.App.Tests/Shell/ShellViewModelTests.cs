@@ -16,6 +16,7 @@ public sealed class ShellViewModelTests : IDisposable
     private readonly CommandRegistry _commands = new();
     private readonly FakeDialogService _dialogs = new();
     private readonly ConnectionManager _connections = new(NullLogger<ConnectionManager>.Instance);
+    private readonly TempSavedConnections _temp = new();
     private readonly ExplorerViewModel _explorer;
     private readonly OutputViewModel _output = new();
     private readonly CapturingLoggerProvider _logs = new();
@@ -25,12 +26,17 @@ public sealed class ShellViewModelTests : IDisposable
     public ShellViewModelTests()
     {
         _loggerFactory = _logs.CreateFactory();
-        _explorer = new ExplorerViewModel(_connections);
-        _shell = new ShellViewModel(_commands, _dialogs, _connections, _explorer, _output,
+        var coordinator = new ConnectionCoordinator(_dialogs, _connections, _temp.Saved);
+        _explorer = new ExplorerViewModel(_connections, _temp.Saved, coordinator);
+        _shell = new ShellViewModel(_commands, coordinator, _explorer, _output,
             _loggerFactory.CreateLogger<ShellViewModel>());
     }
 
-    public void Dispose() => _loggerFactory.Dispose();
+    public void Dispose()
+    {
+        _loggerFactory.Dispose();
+        _temp.Dispose();
+    }
 
     [Fact]
     public void Startup_OpensWelcomePage()
@@ -120,12 +126,12 @@ public sealed class ShellViewModelTests : IDisposable
     public void Connect_WhenTheDialogSucceeds_AddsTheConnectionAndShowsTheExplorer()
     {
         var session = new FakeSession();
-        _dialogs.ConnectResult = session;
+        _dialogs.ConnectResult = new ConnectResult(session, SavedAs: null);
         _explorer.IsVisible = false;
 
         _commands["file.connect"].Execute(null);
 
-        Assert.Same(session, Assert.Single(_connections.Sessions));
+        Assert.Same(session, Assert.Single(_connections.Connections).Session);
         Assert.True(_explorer.IsVisible);
     }
 
@@ -134,8 +140,8 @@ public sealed class ShellViewModelTests : IDisposable
     {
         _commands["file.connect"].Execute(null);
 
-        Assert.Equal(1, _dialogs.ConnectDialogShown);
-        Assert.Empty(_connections.Sessions);
+        Assert.Single(_dialogs.ConnectDialogPrefills);
+        Assert.Empty(_connections.Connections);
     }
 
     [Fact]
@@ -146,7 +152,7 @@ public sealed class ShellViewModelTests : IDisposable
 
         _commands["database.disconnect"].Execute(null);
 
-        Assert.Empty(_connections.Sessions);
+        Assert.Empty(_connections.Connections);
         Assert.Equal(1, session.DisposeCount);
     }
 }

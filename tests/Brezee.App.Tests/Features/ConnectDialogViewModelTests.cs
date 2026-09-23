@@ -1,3 +1,4 @@
+using Brezee.App.Connections;
 using Brezee.App.Features.Connect;
 using Brezee.App.Tests.Support;
 using Brezee.Bridge;
@@ -107,5 +108,58 @@ public class ConnectDialogViewModelTests
 
         Assert.Null(_dialog.ErrorMessage);
         Assert.NotNull(_dialog.Session);
+    }
+
+    [Fact]
+    public void CreateSavedConnection_OnlyWhenAskedAndWithoutPassword()
+    {
+        _dialog.Database = @"C:\Data\employee.fdb";
+        _dialog.Password = "secret";
+
+        Assert.Null(_dialog.CreateSavedConnection());
+
+        _dialog.SaveConnection = true;
+        _dialog.ConnectionName = "  Employee DB ";
+        var saved = _dialog.CreateSavedConnection();
+
+        Assert.NotNull(saved);
+        Assert.Equal("Employee DB", saved.Name);
+        Assert.Equal(@"C:\Data\employee.fdb", saved.Database);
+        Assert.Equal("localhost", saved.Host);
+    }
+
+    [Fact]
+    public void CreateSavedConnection_WithoutName_UsesTheDatabaseFileName()
+    {
+        _dialog.Database = @"C:\Data\employee.fdb";
+        _dialog.SaveConnection = true;
+
+        Assert.Equal("employee.fdb", _dialog.CreateSavedConnection()?.Name);
+    }
+
+    [Fact]
+    public void LoadFrom_PrefillsEverythingButThePasswordAndDoesNotSaveAgain()
+    {
+        var saved = new SavedConnection
+        {
+            Name = "Stock",
+            IsLocal = true,
+            Database = @"C:\Data\stock.fdb",
+            User = "ALICE",
+            Role = "CLERK",
+            Charset = "WIN1252",
+        };
+
+        _dialog.LoadFrom(saved);
+        _dialog.SaveConnection = true;
+
+        Assert.True(_dialog.IsForSavedConnection);
+        Assert.True(_dialog.IsLocal);
+        Assert.Equal(@"C:\Data\stock.fdb", _dialog.Database);
+        Assert.Equal("ALICE", _dialog.User);
+        Assert.Equal("CLERK", _dialog.Role);
+        Assert.Equal("WIN1252", _dialog.Charset);
+        Assert.Equal(string.Empty, _dialog.Password);
+        Assert.Null(_dialog.CreateSavedConnection());
     }
 }

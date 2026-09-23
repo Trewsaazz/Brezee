@@ -38,7 +38,8 @@
 
     <StackPanel Margin="20">
         <StackPanel Orientation="Horizontal" Margin="0,0,0,12"
-                    IsEnabled="{Binding IsBusy, Converter={x:Static local:InverseBooleanConverter.Instance}}">
+                    IsEnabled="{Binding IsBusy, Converter={x:Static local:InverseBooleanConverter.Instance}}"
+                    Visibility="{Binding IsForSavedConnection, Converter={x:Static local:TrueToCollapsedConverter.Instance}}">
             <RadioButton Margin="0,0,20,0"
                          Content="{x:Static res:Strings.Connect_ModeServer}"
                          IsChecked="{Binding IsLocal, Converter={x:Static local:InverseBooleanConverter.Instance}}" />
@@ -96,6 +97,19 @@
             <Label Grid.Row="5" Grid.Column="2" Margin="12,0,0,0" Target="{Binding ElementName=CharsetBox}" Content="{x:Static res:Strings.Connect_Charset}" />
             <TextBox Grid.Row="5" Grid.Column="3" x:Name="CharsetBox" Text="{Binding Charset, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
+
+        <!-- Save for later; hidden when connecting an already saved connection. -->
+        <DockPanel Margin="0,12,0,0"
+                   IsEnabled="{Binding IsBusy, Converter={x:Static local:InverseBooleanConverter.Instance}}"
+                   Visibility="{Binding IsForSavedConnection, Converter={x:Static local:TrueToCollapsedConverter.Instance}}">
+            <CheckBox x:Name="SaveBox" VerticalAlignment="Center"
+                      Content="{x:Static res:Strings.Connect_SaveAs}"
+                      IsChecked="{Binding SaveConnection}" />
+            <TextBox Margin="8,0,0,0"
+                     Text="{Binding ConnectionName, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding IsChecked, ElementName=SaveBox}"
+                     ToolTip="{x:Static res:Strings.Connect_SaveAsHint}" />
+        </DockPanel>
 
         <TextBlock Margin="0,12,0,0"
                    Foreground="Firebrick"

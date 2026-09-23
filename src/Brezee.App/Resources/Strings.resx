@@ -42,6 +42,12 @@
   <data name="Command_FileConnect" xml:space="preserve">
     <value>_Connect to Database…</value>
   </data>
+  <data name="Command_Connect" xml:space="preserve">
+    <value>_Connect</value>
+  </data>
+  <data name="Command_RemoveSaved" xml:space="preserve">
+    <value>_Remove from List</value>
+  </data>
   <data name="Command_Disconnect" xml:space="preserve">
     <value>_Disconnect</value>
   </data>
@@ -68,7 +74,10 @@
     <value>Database Explorer</value>
   </data>
   <data name="Explorer_NoConnections" xml:space="preserve">
-    <value>No connections yet. Use File → Connect to Database… to open one.</value>
+    <value>No databases yet. Use File → Connect to Database… to add one.</value>
+  </data>
+  <data name="Explorer_NotConnected" xml:space="preserve">
+    <value>not connected</value>
   </data>
   <data name="Explorer_Local" xml:space="preserve">
     <value>local</value>
@@ -136,6 +145,12 @@ ODS {2}.{3} · {4} byte pages</value>
   </data>
   <data name="Connect_Charset" xml:space="preserve">
     <value>C_harset</value>
+  </data>
+  <data name="Connect_SaveAs" xml:space="preserve">
+    <value>_Save this connection as</value>
+  </data>
+  <data name="Connect_SaveAsHint" xml:space="preserve">
+    <value>Name shown in the Database Explorer. Leave empty to use the database file name. Passwords are not saved.</value>
   </data>
   <data name="Connect_Connect" xml:space="preserve">
     <value>_Connect</value>

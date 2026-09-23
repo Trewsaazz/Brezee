@@ -17,20 +17,17 @@ namespace Brezee.App.Shell;
 public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly WelcomeViewModel _welcome;
-    private readonly IDialogService _dialogs;
-    private readonly ConnectionManager _connections;
+    private readonly ConnectionCoordinator _coordinator;
 
     public ShellViewModel(
         CommandRegistry commands,
-        IDialogService dialogs,
-        ConnectionManager connections,
+        ConnectionCoordinator coordinator,
         ExplorerViewModel explorer,
         OutputViewModel output,
         ILogger<ShellViewModel> logger)
     {
         Commands = commands;
-        _dialogs = dialogs;
-        _connections = connections;
+        _coordinator = coordinator;
         CoreVersion = CoreInfo.Version;
 
         Tools = [explorer, output];
@@ -91,11 +88,8 @@ public sealed partial class ShellViewModel : ObservableObject
 
     private void Connect(ExplorerViewModel explorer)
     {
-        if (_dialogs.ShowConnectDialog() is not { } session)
-            return;
-
-        _connections.Add(session);
-        explorer.Show();
+        if (_coordinator.ConnectNew() is not null)
+            explorer.Show();
     }
 
     private void OnDocumentCloseRequested(object? sender, EventArgs e)

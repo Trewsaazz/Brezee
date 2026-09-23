@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:Brezee.App.Features.Explorer"
              xmlns:res="clr-namespace:Brezee.App.Resources"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance local:ExplorerViewModel}">
+             d:DataContext="{d:DesignInstance local:ExplorerViewModel}"
+             x:Name="Root">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </UserControl.Resources>
@@ -34,31 +35,59 @@
                  BorderThickness="0"
                  HorizontalContentAlignment="Stretch"
                  Visibility="{Binding HasDatabases, Converter={StaticResource BoolToVisibility}}">
+            <ListBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding ConnectCommand}" />
+                <KeyBinding Key="Delete" Command="{Binding RemoveCommand}" />
+            </ListBox.InputBindings>
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:DatabaseNodeViewModel}">
-                    <StackPanel Margin="2,3" ToolTip="{Binding Details}">
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
-                        <TextBlock Foreground="Gray" FontSize="11">
-                            <Run Text="{Binding Location, Mode=OneWay}" />
-                            <Run Text=" · " />
-                            <Run Text="{Binding ServerVersion, Mode=OneWay}" />
-                        </TextBlock>
-                    </StackPanel>
+                    <DockPanel Margin="2,3" Background="Transparent" ToolTip="{Binding Details}">
+                        <DockPanel.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick"
+                                          Command="{Binding DataContext.ConnectCommand, ElementName=Root}"
+                                          CommandParameter="{Binding}" />
+                        </DockPanel.InputBindings>
+                        <!-- Green dot while connected, hollow ring otherwise. -->
+                        <Ellipse x:Name="Dot" DockPanel.Dock="Left" Width="8" Height="8" Margin="0,5,8,0"
+                                 VerticalAlignment="Top" Stroke="Gray" StrokeThickness="1" />
+                        <StackPanel>
+                            <TextBlock x:Name="NameText" Text="{Binding Name}" />
+                            <TextBlock Foreground="Gray" FontSize="11" TextTrimming="CharacterEllipsis">
+                                <Run Text="{Binding Location, Mode=OneWay}" />
+                                <Run Text=" · " />
+                                <Run Text="{Binding Status, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </DockPanel>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                            <Setter TargetName="Dot" Property="Fill" Value="#2EA44F" />
+                            <Setter TargetName="Dot" Property="Stroke" Value="#2EA44F" />
+                            <Setter TargetName="NameText" Property="FontWeight" Value="SemiBold" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
                 </DataTemplate>
             </ListBox.ItemTemplate>
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
+                    <!-- The context menu reaches the explorer view model through Tag. -->
+                    <Setter Property="Tag" Value="{Binding DataContext, ElementName=Root}" />
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu>
+                                <MenuItem Header="{x:Static res:Strings.Command_Connect}"
+                                          Command="{Binding PlacementTarget.Tag.ConnectCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandParameter="{Binding}" />
                                 <MenuItem Header="{x:Static res:Strings.Command_Disconnect}"
                                           Command="{Binding PlacementTarget.Tag.DisconnectCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandParameter="{Binding}" />
+                                <Separator />
+                                <MenuItem Header="{x:Static res:Strings.Command_RemoveSaved}"
+                                          Command="{Binding PlacementTarget.Tag.RemoveCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                           CommandParameter="{Binding}" />
                             </ContextMenu>
                         </Setter.Value>
                     </Setter>
-                    <!-- The context menu reaches the explorer view model through Tag. -->
-                    <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}" />
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>

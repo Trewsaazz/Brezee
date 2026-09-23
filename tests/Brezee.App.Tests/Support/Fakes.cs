@@ -1,6 +1,8 @@
+using System.IO;
 using Brezee.App.Connections;
 using Brezee.App.Shell;
 using Brezee.Bridge;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Brezee.App.Tests.Support;
 
@@ -47,14 +49,42 @@ public sealed class FakeConnector : IDatabaseConnector
 
 public sealed class FakeDialogService : IDialogService
 {
-    // What the Connect dialog "returns": a session, or null for Cancel.
-    public IDatabaseSession? ConnectResult { get; set; }
+    // What the Connect dialog "returns": a result, or null for Cancel.
+    public ConnectResult? ConnectResult { get; set; }
 
-    public int ConnectDialogShown { get; private set; }
+    public List<SavedConnection?> ConnectDialogPrefills { get; } = [];
 
-    public IDatabaseSession? ShowConnectDialog()
+    public ConnectResult? ShowConnectDialog(SavedConnection? prefill)
     {
-        ConnectDialogShown++;
+        ConnectDialogPrefills.Add(prefill);
         return ConnectResult;
     }
+}
+
+// A SavedConnections backed by a temporary file, deleted on dispose.
+public sealed class TempSavedConnections : IDisposable
+{
+    private readonly string _directory = Path.Combine(Path.GetTempPath(), $"brezee-tests-{Guid.NewGuid():N}");
+
+    public TempSavedConnections()
+    {
+        Store = new ConnectionStore(Path.Combine(_directory, "connections.json"), NullLogger<ConnectionStore>.Instance);
+        Saved = new SavedConnections(Store, NullLogger<SavedConnections>.Instance);
+    }
+
+    public ConnectionStore Store { get; }
+
+    public SavedConnections Saved { get; }
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_directory))
+            Directory.Delete(_directory, recursive: true);
+    }
+}
+
+public static class TestData
+{
+    public static SavedConnection Saved(string name = "Employee", string database = "C:/data/employee.fdb", string host = "localhost") =>
+        new() { Name = name, Database = database, Host = host, IsLocal = host.Length == 0 };
 }
