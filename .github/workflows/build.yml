@@ -22,16 +22,18 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Build solution
-        run: msbuild Brezee.sln -restore -m -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 "-flp:ErrorsOnly;LogFile=msbuild-errors.log"
+        run: msbuild Brezee.sln -restore -m -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 "-flp1:ErrorsOnly;LogFile=msbuild-errors.log" "-flp2:WarningsOnly;LogFile=msbuild-warnings.log"
 
-      # Turn MSBuild errors into annotations so failures are readable without opening the full log.
-      - name: Report build errors
-        if: failure()
+      # Turn MSBuild errors and warnings into annotations so they are readable without opening the full log.
+      - name: Report build diagnostics
+        if: always()
         shell: pwsh
         run: |
-          if (Test-Path msbuild-errors.log) {
-            Get-Content msbuild-errors.log | Where-Object { $_.Trim() } | Select-Object -Unique -First 50 |
-              ForEach-Object { Write-Output "::error::$_" }
+          foreach ($entry in @(@{ File = 'msbuild-errors.log'; Level = 'error' }, @{ File = 'msbuild-warnings.log'; Level = 'warning' })) {
+            if (Test-Path $entry.File) {
+              Get-Content $entry.File | Where-Object { $_.Trim() } | Select-Object -Unique -First 50 |
+                ForEach-Object { Write-Output "::$($entry.Level)::$_" }
+            }
           }
 
       - name: Upload app

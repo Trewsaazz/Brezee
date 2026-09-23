@@ -10,10 +10,9 @@ inline System::String^ ToManaged(std::string_view utf8)
     if (utf8.empty())
         return System::String::Empty;
 
-    auto bytes = gcnew array<System::Byte>(static_cast<int>(utf8.size()));
-    System::Runtime::InteropServices::Marshal::Copy(
-        System::IntPtr(const_cast<char*>(utf8.data())), bytes, 0, bytes->Length);
-    return System::Text::Encoding::UTF8->GetString(bytes);
+    // Encoding::GetString takes a non-const pointer but never writes through it.
+    auto* bytes = reinterpret_cast<unsigned char*>(const_cast<char*>(utf8.data()));
+    return System::Text::Encoding::UTF8->GetString(bytes, static_cast<int>(utf8.size()));
 }
 
 } // namespace Brezee::Bridge::Interop
