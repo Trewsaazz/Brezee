@@ -15,17 +15,11 @@ TEST_CASE("Error carries its kind and message")
     CHECK(std::string(error.what()) == "Server not reachable");
 }
 
-TEST_CASE("Error can be caught as std::exception")
+TEST_CASE("Error is a std::exception")
 {
-    try
-    {
-        throw Error(ErrorKind::Database, "Table not found");
-    }
-    catch (const std::exception& e)
-    {
-        CHECK(std::string(e.what()) == "Table not found");
-        return;
-    }
+    // Checked through a base reference rather than throw/catch, which MSVC flags as unreachable code.
+    const Error error(ErrorKind::Database, "Table not found");
+    const std::exception& base = error;
 
-    FAIL("exception was not caught");
+    CHECK(std::string(base.what()) == "Table not found");
 }
