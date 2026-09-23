@@ -160,6 +160,29 @@ ODS {2}.{3} · {4} byte pages</value>
     <value>Databases you connect to will be listed here.</value>
   </data>
 
+  <!-- Table data -->
+  <data name="TableData_Filter" xml:space="preserve">
+    <value>_Where</value>
+  </data>
+  <data name="TableData_FilterHint" xml:space="preserve">
+    <value>A SQL condition, e.g. CITY = 'Madrid' AND BALANCE &gt; 100. Press Enter to apply.</value>
+  </data>
+  <data name="TableData_Apply" xml:space="preserve">
+    <value>_Apply</value>
+  </data>
+  <data name="TableData_Rows" xml:space="preserve">
+    <value>{0:N0} rows</value>
+  </data>
+  <data name="TableData_RowsMore" xml:space="preserve">
+    <value>{0:N0} rows loaded, more available</value>
+  </data>
+  <data name="TableData_LoadMore" xml:space="preserve">
+    <value>Load _more</value>
+  </data>
+  <data name="Command_OpenData" xml:space="preserve">
+    <value>_View Data</value>
+  </data>
+
   <!-- Connect dialog -->
   <data name="Connect_Title" xml:space="preserve">
     <value>Connect to Database</value>

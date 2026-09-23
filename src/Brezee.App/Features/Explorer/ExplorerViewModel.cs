@@ -53,6 +53,16 @@ public sealed partial class ExplorerViewModel : ToolViewModel
 
     public bool HasDatabases => Databases.Count > 0;
 
+    // Raised when the user asks to see a table's or view's data; the shell opens a document.
+    public event EventHandler<ObjectNode>? OpenDataRequested;
+
+    [RelayCommand]
+    private void OpenData(ObjectNode? node)
+    {
+        if ((node ?? SelectedNode as ObjectNode) is { HasData: true, Database.IsConnected: true } target)
+            OpenDataRequested?.Invoke(this, target);
+    }
+
     // Commands act on the node passed in (context menu, double-click) or else the selected one.
     private DatabaseNodeViewModel? Target(DatabaseNodeViewModel? node) => node ?? SelectedDatabase;
 

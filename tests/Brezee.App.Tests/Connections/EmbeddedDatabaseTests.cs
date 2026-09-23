@@ -84,4 +84,46 @@ public sealed class EmbeddedDatabaseTests : IDisposable
         Assert.True(relations.IsSystem);
         Assert.Equal(DatabaseObjectType.Table, relations.Type);
     }
+
+    [Fact]
+    public void Execute_ReturnsTypedDotNetValues()
+    {
+        using var connection = DatabaseConnection.Create(Local);
+        connection.Execute("create table t (id integer, amount numeric(10,2), born date, note varchar(10), photo blob)", [], 0);
+        connection.Execute("insert into t values (?, ?, ?, ?, null)", ["7", "12.50", "1815-12-10", null], 0);
+
+        var result = connection.Execute("select id, amount, born, note, photo from t", [], 0);
+
+        Assert.Equal(["ID", "AMOUNT", "BORN", "NOTE", "PHOTO"], result.Columns.Select(c => c.Name));
+        Assert.Equal(ResultColumnKind.Decimal, result.Columns[1].Kind);
+        Assert.Equal("NUMERIC(10,2)", result.Columns[1].TypeName);
+        var row = Assert.Single(result.Rows);
+        Assert.Equal(7L, row[0]);
+        Assert.Equal(12.50m, row[1]);
+        Assert.Equal(new DateOnly(1815, 12, 10), row[2]);
+        Assert.Null(row[3]);
+        Assert.Null(row[4]);
+    }
+
+    [Fact]
+    public void Execute_MaxRows_TruncatesAndSaysSo()
+    {
+        using var connection = DatabaseConnection.Create(Local);
+
+        var result = connection.Execute("select rdb$type from rdb$types", [], 5);
+
+        Assert.Equal(5, result.Rows.Count);
+        Assert.True(result.Truncated);
+    }
+
+    [Fact]
+    public void Execute_BadSql_ThrowsDatabaseError()
+    {
+        using var connection = DatabaseConnection.Create(Local);
+
+        var error = Assert.Throws<CoreException>(() => connection.Execute("select * from nowhere", [], 0));
+
+        Assert.Equal(CoreErrorKind.Database, error.Kind);
+        Assert.Contains("NOWHERE", error.Message);
+    }
 }

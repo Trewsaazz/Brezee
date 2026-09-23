@@ -1,5 +1,7 @@
 #pragma once
 
+#include "QueryResultData.h"
+
 namespace brezee::core {
 class Connection;
 }
@@ -94,6 +96,11 @@ public:
 
     // Lists the objects of one type, ordered by name; system objects only if asked for.
     System::Collections::Generic::IReadOnlyList<DatabaseObjectInfo^>^ ListObjects(DatabaseObjectType type, bool includeSystem);
+
+    // Runs one SQL statement in its own transaction (committed on success). "?" placeholders take
+    // the parameters in order, as text (null for NULL). maxRows limits how many rows are read
+    // (0 = all); QueryResultData.Truncated tells whether more were available.
+    QueryResultData^ Execute(System::String^ sql, System::Collections::Generic::IList<System::String^>^ parameters, int maxRows);
 
     // Disconnects, reporting errors as CoreException.
     void Close();

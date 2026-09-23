@@ -2,9 +2,11 @@ using Brezee.App.Commands;
 using Brezee.App.Connections;
 using Brezee.App.Features.Explorer;
 using Brezee.App.Features.Output;
+using Brezee.App.Features.TableData;
 using Brezee.App.Features.Welcome;
 using Brezee.App.Shell;
 using Brezee.App.Tests.Support;
+using Brezee.Bridge;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -28,7 +30,7 @@ public sealed class ShellViewModelTests : IDisposable
         _loggerFactory = _logs.CreateFactory();
         var coordinator = TestData.Coordinator(_dialogs, _connections, _temp.Saved);
         _explorer = new ExplorerViewModel(_connections, _temp.Saved, coordinator);
-        _shell = new ShellViewModel(_commands, coordinator, _temp.CreateRecent(_connections), _explorer, _output,
+        _shell = new ShellViewModel(_commands, coordinator, _connections, _temp.CreateRecent(_connections), _explorer, _output,
             _loggerFactory.CreateLogger<ShellViewModel>());
     }
 
@@ -177,5 +179,44 @@ public sealed class ShellViewModelTests : IDisposable
         Assert.Single(_connections.Connections);
         Assert.True(_explorer.IsVisible);
         Assert.Equal("C:/data/employee.fdb", _dialogs.ConnectDialogPrefills.Single()?.Database);
+    }
+
+    private ObjectNode ConnectWithTable(FakeSession session, string table)
+    {
+        _connections.Add(session);
+        var database = _explorer.Databases.Single();
+        return new ObjectNode(database, new DatabaseObjectInfo
+        {
+            Type = DatabaseObjectType.Table,
+            Name = table,
+            Parent = string.Empty,
+            Description = string.Empty,
+            Flags = [],
+        });
+    }
+
+    [Fact]
+    public void OpenData_OpensATabForTheTableAndReusesIt()
+    {
+        var node = ConnectWithTable(new FakeSession(), "CUSTOMERS");
+
+        _explorer.OpenDataCommand.Execute(node);
+        _explorer.OpenDataCommand.Execute(node);
+
+        var document = Assert.Single(_shell.Documents.OfType<TableDataViewModel>());
+        Assert.Equal("CUSTOMERS", document.Table);
+        Assert.Same(document, _shell.ActiveDocument);
+    }
+
+    [Fact]
+    public void Disconnecting_ClosesThatDatabasesTabs()
+    {
+        var node = ConnectWithTable(new FakeSession(), "CUSTOMERS");
+        _explorer.OpenDataCommand.Execute(node);
+
+        _connections.Disconnect(_connections.Connections.Single());
+
+        Assert.Empty(_shell.Documents.OfType<TableDataViewModel>());
+        Assert.Single(_shell.Documents); // The welcome page stays.
     }
 }

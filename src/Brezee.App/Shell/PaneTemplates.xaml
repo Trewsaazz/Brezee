@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:explorer="clr-namespace:Brezee.App.Features.Explorer"
                     xmlns:output="clr-namespace:Brezee.App.Features.Output"
-                    xmlns:welcome="clr-namespace:Brezee.App.Features.Welcome">
+                    xmlns:welcome="clr-namespace:Brezee.App.Features.Welcome"
+                    xmlns:tableData="clr-namespace:Brezee.App.Features.TableData">
 
     <!-- Maps each pane view model to its view. Add one entry per new panel or document type. -->
 
@@ -16,6 +17,10 @@
 
     <DataTemplate DataType="{x:Type welcome:WelcomeViewModel}">
         <welcome:WelcomeView />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type tableData:TableDataViewModel}">
+        <tableData:TableDataView />
     </DataTemplate>
 
 </ResourceDictionary>

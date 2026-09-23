@@ -21,28 +21,35 @@ public partial class ExplorerView : UserControl
             viewModel.SelectedNode = e.NewValue as ExplorerNode;
     }
 
-    // Double-clicking a disconnected database connects it.
+    // Double-click: connects a disconnected database, opens a table's or view's data.
     private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (ViewModel is { } viewModel
-            && Tree.SelectedItem is DatabaseNodeViewModel { IsConnected: false } database
-            && viewModel.ConnectCommand.CanExecute(database))
-        {
-            viewModel.ConnectCommand.Execute(database);
+        if (Activate(Tree.SelectedItem))
             e.Handled = true;
-        }
     }
 
-    // Enter on a disconnected database connects it (elsewhere it keeps its usual meaning).
+    // Enter does the same as double-click (elsewhere it keeps its usual meaning).
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter
-            && ViewModel is { } viewModel
-            && Tree.SelectedItem is DatabaseNodeViewModel { IsConnected: false } database
-            && viewModel.ConnectCommand.CanExecute(database))
-        {
-            viewModel.ConnectCommand.Execute(database);
+        if (e.Key == Key.Enter && Activate(Tree.SelectedItem))
             e.Handled = true;
+    }
+
+    private bool Activate(object? item)
+    {
+        if (ViewModel is not { } viewModel)
+            return false;
+
+        switch (item)
+        {
+            case DatabaseNodeViewModel { IsConnected: false } database when viewModel.ConnectCommand.CanExecute(database):
+                viewModel.ConnectCommand.Execute(database);
+                return true;
+            case ObjectNode { HasData: true } node:
+                viewModel.OpenDataCommand.Execute(node);
+                return true;
+            default:
+                return false;
         }
     }
 }

@@ -4,6 +4,9 @@
 
 #include <brezee/core/connection.h>
 #include <brezee/core/metadata.h>
+#include <brezee/core/query.h>
+
+#include <type_traits>
 
 namespace {
 
@@ -25,6 +28,79 @@ brezee::core::ConnectionParameters ToNative(ConnectionSettings^ settings)
     parameters.role = Interop::ToNative(settings->Role);
     parameters.charset = Interop::ToNative(settings->Charset);
     return parameters;
+}
+
+// Converts one core value to the .NET type documented on ResultColumnKind.
+System::Object^ ToManagedValue(const brezee::core::Value& value)
+{
+    using namespace brezee::core;
+
+    return std::visit([](const auto& v) -> System::Object^ {
+        using T = std::decay_t<decltype(v)>;
+        if constexpr (std::is_same_v<T, std::monostate>)
+            return nullptr;
+        else if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, std::int64_t> || std::is_same_v<T, double>)
+            return v;
+        else if constexpr (std::is_same_v<T, Decimal>)
+        {
+            auto text = Interop::ToManaged(v.text);
+            System::Decimal parsed;
+            // Values beyond System.Decimal's 28-29 digits stay text, so nothing is rounded.
+            if (System::Decimal::TryParse(text, System::Globalization::NumberStyles::Float,
+                    System::Globalization::CultureInfo::InvariantCulture, parsed))
+                return parsed;
+            return text;
+        }
+        else if constexpr (std::is_same_v<T, std::string>)
+            return Interop::ToManaged(v);
+        else if constexpr (std::is_same_v<T, Date>)
+            return System::DateOnly(v.year, v.month, v.day);
+        else if constexpr (std::is_same_v<T, Time>)
+            return System::TimeOnly(System::TimeSpan(v.hours, v.minutes, v.seconds).Ticks + v.fractions * 1000LL);
+        else if constexpr (std::is_same_v<T, Timestamp>)
+            return System::DateTime(v.date.year, v.date.month, v.date.day, v.time.hours, v.time.minutes, v.time.seconds)
+                .AddTicks(v.time.fractions * 1000LL);
+        else if constexpr (std::is_same_v<T, Bytes>)
+        {
+            auto bytes = gcnew array<System::Byte>(static_cast<int>(v.size()));
+            for (int i = 0; i < bytes->Length; ++i)
+                bytes[i] = v[static_cast<std::size_t>(i)];
+            return bytes;
+        }
+        else
+            return nullptr;
+    }, value);
+}
+
+QueryResultData^ ToManaged(const brezee::core::QueryResult& result)
+{
+    auto columns = gcnew System::Collections::Generic::List<ResultColumn^>(static_cast<int>(result.columns.size()));
+    for (const auto& column : result.columns)
+    {
+        auto managed = gcnew ResultColumn();
+        managed->Name = Interop::ToManaged(column.name);
+        managed->Field = Interop::ToManaged(column.field);
+        managed->Relation = Interop::ToManaged(column.relation);
+        managed->TypeName = Interop::ToManaged(column.type);
+        managed->Kind = static_cast<ResultColumnKind>(static_cast<int>(column.kind));
+        managed->IsNullable = column.nullable;
+        columns->Add(managed);
+    }
+
+    auto rows = gcnew System::Collections::Generic::List<array<System::Object^>^>(static_cast<int>(result.rows.size()));
+    for (const auto& row : result.rows)
+    {
+        auto values = gcnew array<System::Object^>(static_cast<int>(row.size()));
+        for (int i = 0; i < values->Length; ++i)
+            values[i] = ToManagedValue(row[static_cast<std::size_t>(i)]);
+        rows->Add(values);
+    }
+
+    auto data = gcnew QueryResultData();
+    data->Columns = columns->AsReadOnly();
+    data->Rows = rows->AsReadOnly();
+    data->Truncated = result.truncated;
+    return data;
 }
 
 } // namespace
@@ -130,6 +206,43 @@ System::Collections::Generic::IReadOnlyList<DatabaseObjectInfo^>^ DatabaseConnec
             result->Add(info);
         }
         return result->AsReadOnly();
+    }
+    catch (const std::exception& e)
+    {
+        throw ToManagedException(e);
+    }
+}
+
+QueryResultData^ DatabaseConnection::Execute(
+    System::String^ sql, System::Collections::Generic::IList<System::String^>^ parameters, int maxRows)
+{
+    if (_connection == nullptr)
+        throw gcnew System::ObjectDisposedException("DatabaseConnection");
+    if (sql == nullptr)
+        throw gcnew System::ArgumentNullException("sql");
+    if (maxRows < 0)
+        throw gcnew System::ArgumentOutOfRangeException("maxRows");
+
+    brezee::core::Parameters native;
+    if (parameters != nullptr)
+    {
+        for each (System::String^ parameter in parameters)
+        {
+            if (parameter == nullptr)
+                native.push_back(std::nullopt);
+            else
+                native.push_back(Interop::ToNative(parameter));
+        }
+    }
+
+    brezee::core::QueryOptions options;
+    if (maxRows > 0)
+        options.max_rows = static_cast<std::size_t>(maxRows);
+
+    const auto text = Interop::ToNative(sql);
+    try
+    {
+        return ToManaged(_connection->execute(text, native, options));
     }
     catch (const std::exception& e)
     {

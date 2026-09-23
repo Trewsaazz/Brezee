@@ -42,6 +42,25 @@ public sealed class FakeSession(string database = "C:/data/employee.fdb", string
         return Task.FromResult(objects);
     }
 
+    // What ExecuteAsync returns: computed from the SQL, so tests can page or filter.
+    public Func<string, int, QueryResultData>? Query { get; set; }
+
+    // When set, ExecuteAsync fails with this.
+    public Exception? QueryFailure { get; set; }
+
+    public List<string> ExecutedSql { get; } = [];
+
+    public Task<QueryResultData> ExecuteAsync(
+        string sql, IReadOnlyList<string?>? parameters = null, int maxRows = 0, CancellationToken cancellationToken = default)
+    {
+        ExecutedSql.Add(sql);
+        if (QueryFailure is not null)
+            return Task.FromException<QueryResultData>(QueryFailure);
+
+        return Task.FromResult(Query?.Invoke(sql, maxRows)
+            ?? new QueryResultData { Columns = [], Rows = [], Truncated = false });
+    }
+
     public FakeSession WithObjects(DatabaseObjectType type, params string[] names)
     {
         Objects[type] = names.Select(name => new DatabaseObjectInfo

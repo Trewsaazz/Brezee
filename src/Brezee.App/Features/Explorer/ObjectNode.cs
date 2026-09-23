@@ -21,6 +21,9 @@ public sealed class ObjectNode(DatabaseNodeViewModel database, DatabaseObjectInf
     // Flags such as "unique" or "legacy UDF", shown after the name.
     public string FlagsText => Info.Flags.Count == 0 ? string.Empty : $"({string.Join(", ", Info.Flags)})";
 
+    // Tables and views have rows to show in a data grid.
+    public bool HasData => Info.Type is DatabaseObjectType.Table or DatabaseObjectType.View;
+
     // Tooltip: the description, if the object has one.
     public string? Description => string.IsNullOrEmpty(Info.Description) ? null : Info.Description;
 }

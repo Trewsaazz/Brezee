@@ -5,6 +5,7 @@ using Brezee.App.Commands;
 using Brezee.App.Connections;
 using Brezee.App.Features.Explorer;
 using Brezee.App.Features.Output;
+using Brezee.App.Features.TableData;
 using Brezee.App.Features.Welcome;
 using Brezee.App.Resources;
 using Brezee.Bridge;
@@ -23,6 +24,7 @@ public sealed partial class ShellViewModel : ObservableObject
     public ShellViewModel(
         CommandRegistry commands,
         ConnectionCoordinator coordinator,
+        ConnectionManager connections,
         RecentConnections recent,
         ExplorerViewModel explorer,
         OutputViewModel output,
@@ -32,6 +34,9 @@ public sealed partial class ShellViewModel : ObservableObject
         _coordinator = coordinator;
         _explorer = explorer;
         Recent = recent;
+
+        explorer.OpenDataRequested += (_, node) => OpenTableData(node);
+        connections.Removed += (_, connection) => CloseDocumentsOf(connection);
         CoreVersion = CoreInfo.Version;
 
         Tools = [explorer, output];
@@ -104,6 +109,34 @@ public sealed partial class ShellViewModel : ObservableObject
     {
         if (await _coordinator.ConnectRecentAsync(recent) is not null)
             _explorer.Show();
+    }
+
+    // Shows a table's or view's rows, reusing its tab if already open.
+    private void OpenTableData(ObjectNode node)
+    {
+        if (node.Database.Active is not { } connection)
+            return;
+
+        var contentId = TableDataViewModel.ContentIdFor(connection, node.Name);
+        if (Documents.FirstOrDefault(d => d.ContentId == contentId) is { } existing)
+        {
+            ActiveDocument = existing;
+            return;
+        }
+
+        var document = new TableDataViewModel(connection, node.Database.Name, node.Name);
+        OpenDocument(document);
+        _ = document.LoadAsync();
+    }
+
+    // A disconnected database's documents cannot work any more.
+    private void CloseDocumentsOf(ActiveConnection connection)
+    {
+        foreach (var document in Documents.OfType<TableDataViewModel>().Where(d => d.Connection == connection).ToList())
+        {
+            document.CloseRequested -= OnDocumentCloseRequested;
+            Documents.Remove(document);
+        }
     }
 
     private void OnDocumentCloseRequested(object? sender, EventArgs e)

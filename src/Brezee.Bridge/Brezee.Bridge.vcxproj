@@ -51,6 +51,7 @@
     <ClInclude Include="CoreRuntime.h" />
     <ClInclude Include="DatabaseConnection.h" />
     <ClInclude Include="Interop.h" />
+    <ClInclude Include="QueryResultData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CoreInfo.cpp" />

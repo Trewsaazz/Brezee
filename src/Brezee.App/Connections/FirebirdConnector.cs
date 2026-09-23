@@ -32,6 +32,10 @@ public sealed class FirebirdConnector : IDatabaseConnector
             DatabaseObjectType type, bool includeSystem = false, CancellationToken cancellationToken = default) =>
             Task.Run(() => connection.ListObjects(type, includeSystem), cancellationToken);
 
+        public Task<QueryResultData> ExecuteAsync(
+            string sql, IReadOnlyList<string?>? parameters = null, int maxRows = 0, CancellationToken cancellationToken = default) =>
+            Task.Run(() => connection.Execute(sql, parameters?.ToList() ?? [], maxRows), cancellationToken);
+
         public void Dispose() => connection.Dispose();
     }
 }

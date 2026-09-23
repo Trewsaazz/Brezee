@@ -12,6 +12,11 @@ public interface IDatabaseSession : IDisposable
     // Lists the objects of one type without blocking the UI. Throws CoreException on failure.
     Task<IReadOnlyList<DatabaseObjectInfo>> ListObjectsAsync(
         DatabaseObjectType type, bool includeSystem = false, CancellationToken cancellationToken = default);
+
+    // Runs one SQL statement without blocking the UI (see DatabaseConnection.Execute).
+    // Throws CoreException when Firebird rejects it.
+    Task<QueryResultData> ExecuteAsync(
+        string sql, IReadOnlyList<string?>? parameters = null, int maxRows = 0, CancellationToken cancellationToken = default);
 }
 
 // Opens database sessions. Abstracted so view models can be tested without a Firebird server.

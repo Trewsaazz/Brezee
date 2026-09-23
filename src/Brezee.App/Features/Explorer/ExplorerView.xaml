@@ -28,6 +28,13 @@
                       CommandParameter="{Binding}" />
         </ContextMenu>
 
+        <ContextMenu x:Key="ObjectMenu">
+            <MenuItem Header="{x:Static res:Strings.Command_OpenData}"
+                      Command="{Binding PlacementTarget.Tag.OpenDataCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      CommandParameter="{Binding}"
+                      Visibility="{Binding HasData, Converter={StaticResource BoolToVisibility}}" />
+        </ContextMenu>
+
         <ContextMenu x:Key="FolderMenu">
             <MenuItem Header="{x:Static res:Strings.Command_Refresh}" Command="{Binding LoadCommand}" />
         </ContextMenu>
@@ -66,7 +73,17 @@
 
         <!-- An object; triggers and indices also show their table. -->
         <DataTemplate DataType="{x:Type local:ObjectNode}">
-            <StackPanel Orientation="Horizontal" Margin="0,1" ToolTip="{Binding Description}">
+            <StackPanel Orientation="Horizontal" Margin="0,1" ToolTip="{Binding Description}"
+                        Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasData}" Value="True">
+                                <Setter Property="ContextMenu" Value="{StaticResource ObjectMenu}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
                 <TextBlock x:Name="NameText" Text="{Binding Name}" />
                 <TextBlock Text="{Binding Parent}" Margin="6,0,0,0" Foreground="Gray"
                            Visibility="{Binding HasParent, Converter={StaticResource BoolToVisibility}}" />

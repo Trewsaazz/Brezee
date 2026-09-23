@@ -5,6 +5,9 @@ namespace Brezee.App.Connections;
 // An open session, and the saved connection it was opened from (if any).
 public sealed class ActiveConnection(IDatabaseSession session, Guid? savedConnectionId)
 {
+    // Identifies this connection while it is open, e.g. to find its document tabs.
+    public Guid Id { get; } = Guid.NewGuid();
+
     public IDatabaseSession Session { get; } = session;
 
     public Guid? SavedConnectionId { get; } = savedConnectionId;
