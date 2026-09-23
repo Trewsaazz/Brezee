@@ -28,7 +28,7 @@ public sealed class ShellViewModelTests : IDisposable
         _loggerFactory = _logs.CreateFactory();
         var coordinator = TestData.Coordinator(_dialogs, _connections, _temp.Saved);
         _explorer = new ExplorerViewModel(_connections, _temp.Saved, coordinator);
-        _shell = new ShellViewModel(_commands, coordinator, _explorer, _output,
+        _shell = new ShellViewModel(_commands, coordinator, _temp.CreateRecent(_connections), _explorer, _output,
             _loggerFactory.CreateLogger<ShellViewModel>());
     }
 
@@ -154,5 +154,28 @@ public sealed class ShellViewModelTests : IDisposable
 
         Assert.Empty(_connections.Connections);
         Assert.Equal(1, session.DisposeCount);
+    }
+
+    [Fact]
+    public void Connections_AreAddedToRecent()
+    {
+        _connections.Add(new FakeSession("C:/data/employee.fdb"));
+
+        Assert.Equal("employee.fdb", Assert.Single(_shell.Recent.Items).Name);
+    }
+
+    [Fact]
+    public async Task OpenRecent_ReconnectsAndShowsTheExplorer()
+    {
+        var active = _connections.Add(new FakeSession("C:/data/employee.fdb"));
+        _connections.Disconnect(active);
+        _dialogs.ConnectResult = new ConnectResult(new FakeSession("C:/data/employee.fdb"), SavedAs: null);
+        _explorer.IsVisible = false;
+
+        await _shell.OpenRecentCommand.ExecuteAsync(_shell.Recent.Items[0]);
+
+        Assert.Single(_connections.Connections);
+        Assert.True(_explorer.IsVisible);
+        Assert.Equal("C:/data/employee.fdb", _dialogs.ConnectDialogPrefills.Single()?.Database);
     }
 }

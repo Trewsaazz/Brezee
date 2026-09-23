@@ -137,4 +137,42 @@ public sealed class ConnectionCoordinatorTests : IDisposable
         Assert.Equal(saved.Name, stored.Name);
         Assert.Equal(saved.Id, stored.Id);
     }
+
+    [Fact]
+    public async Task ConnectRecent_OfASavedConnection_UsesItsRememberedPassword()
+    {
+        var saved = TestData.Saved() with { ProtectedPassword = "protected:secret" };
+        _temp.Saved.Add(saved);
+        var recent = new RecentConnection { Name = saved.Name, Database = saved.Database, SavedConnectionId = saved.Id };
+
+        var connection = await _coordinator.ConnectRecentAsync(recent);
+
+        Assert.Empty(_dialogs.ConnectDialogPrefills);
+        Assert.Equal("secret", _connector.LastSettings?.Password);
+        Assert.Equal(saved.Id, connection?.SavedConnectionId);
+    }
+
+    [Fact]
+    public async Task ConnectRecent_Unsaved_OpensThePrefilledDialogAsANewConnection()
+    {
+        var recent = new RecentConnection { Name = "stock.fdb", Database = @"C:\Data\stock.fdb", IsLocal = true, User = "ALICE" };
+        _dialogs.ConnectResult = new ConnectResult(new FakeSession(), SavedAs: null);
+
+        await _coordinator.ConnectRecentAsync(recent);
+
+        var prefill = Assert.Single(_dialogs.ConnectDialogPrefills);
+        Assert.Equal(@"C:\Data\stock.fdb", prefill?.Database);
+        Assert.Equal("ALICE", prefill?.User);
+        Assert.False(Assert.Single(_dialogs.ConnectDialogPrefillIsSaved));
+    }
+
+    [Fact]
+    public async Task ConnectRecent_WhoseSavedConnectionWasRemoved_FallsBackToTheDialog()
+    {
+        var recent = new RecentConnection { Name = "Gone", Database = "gone.fdb", SavedConnectionId = Guid.NewGuid() };
+
+        Assert.Null(await _coordinator.ConnectRecentAsync(recent)); // Dialog cancelled.
+
+        Assert.False(Assert.Single(_dialogs.ConnectDialogPrefillIsSaved));
+    }
 }

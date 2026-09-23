@@ -81,6 +81,10 @@ public partial class App : Application
         services.AddSingleton(provider =>
             new ConnectionStore(ConnectionStore.DefaultPath, provider.GetRequiredService<ILogger<ConnectionStore>>()));
         services.AddSingleton<SavedConnections>();
+        services.AddSingleton(provider =>
+            new RecentConnectionStore(RecentConnectionStore.DefaultPath, provider.GetRequiredService<ILogger<RecentConnectionStore>>()));
+        services.AddSingleton<RecentConnections>();
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ConnectionCoordinator>();
 
         // Shell

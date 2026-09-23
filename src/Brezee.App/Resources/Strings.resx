@@ -34,6 +34,9 @@
   <data name="Menu_File" xml:space="preserve">
     <value>_File</value>
   </data>
+  <data name="Menu_RecentConnections" xml:space="preserve">
+    <value>_Recent Connections</value>
+  </data>
   <data name="Menu_View" xml:space="preserve">
     <value>_View</value>
   </data>
@@ -104,6 +107,15 @@ ODS {2}.{3} · {4} byte pages</value>
   <!-- Welcome page -->
   <data name="Welcome_Title" xml:space="preserve">
     <value>Welcome</value>
+  </data>
+  <data name="Welcome_Connect" xml:space="preserve">
+    <value>Connect to a database…</value>
+  </data>
+  <data name="Welcome_Recent" xml:space="preserve">
+    <value>Recent</value>
+  </data>
+  <data name="Welcome_NoRecent" xml:space="preserve">
+    <value>Databases you connect to will be listed here.</value>
   </data>
 
   <!-- Connect dialog -->

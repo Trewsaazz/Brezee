@@ -15,9 +15,21 @@ public sealed class ConnectionCoordinator(
     private readonly HashSet<Guid> _connecting = [];
 
     // Connects to a database the user enters in the Connect dialog. Returns null if cancelled.
-    public ActiveConnection? ConnectNew()
+    public ActiveConnection? ConnectNew() => ConnectThroughDialog(template: null);
+
+    // Reconnects to a recently used database: through its saved connection if it still exists,
+    // otherwise through the Connect dialog pre-filled with its details.
+    public async Task<ActiveConnection?> ConnectRecentAsync(RecentConnection recent)
     {
-        if (dialogs.ShowConnectDialog(null) is not { } result)
+        if (recent.SavedConnectionId is { } id && saved.Find(id) is { } savedConnection)
+            return await ConnectAsync(savedConnection);
+
+        return ConnectThroughDialog(recent.ToTemplate());
+    }
+
+    private ActiveConnection? ConnectThroughDialog(SavedConnection? template)
+    {
+        if (dialogs.ShowConnectDialog(template, prefillIsSaved: false) is not { } result)
             return null;
 
         if (result.SavedAs is { } savedAs)

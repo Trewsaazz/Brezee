@@ -6,11 +6,11 @@ namespace Brezee.App.Shell;
 
 public sealed class DialogService(IDatabaseConnector connector, ICredentialProtector protector) : IDialogService
 {
-    public ConnectResult? ShowConnectDialog(SavedConnection? prefill, string? error = null)
+    public ConnectResult? ShowConnectDialog(SavedConnection? prefill, string? error = null, bool prefillIsSaved = true)
     {
         var viewModel = new ConnectDialogViewModel(connector, protector);
         if (prefill is not null)
-            viewModel.LoadFrom(prefill);
+            viewModel.LoadFrom(prefill, prefillIsSaved);
         viewModel.ErrorMessage = error;
 
         var dialog = new ConnectDialog(viewModel) { Owner = Application.Current.MainWindow };

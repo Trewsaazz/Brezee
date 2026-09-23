@@ -18,29 +18,36 @@ public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly WelcomeViewModel _welcome;
     private readonly ConnectionCoordinator _coordinator;
+    private readonly ExplorerViewModel _explorer;
 
     public ShellViewModel(
         CommandRegistry commands,
         ConnectionCoordinator coordinator,
+        RecentConnections recent,
         ExplorerViewModel explorer,
         OutputViewModel output,
         ILogger<ShellViewModel> logger)
     {
         Commands = commands;
         _coordinator = coordinator;
+        _explorer = explorer;
+        Recent = recent;
         CoreVersion = CoreInfo.Version;
 
         Tools = [explorer, output];
 
-        _welcome = new WelcomeViewModel(CoreVersion);
-        OpenDocument(_welcome);
-
         RegisterCommands(explorer, output);
+
+        _welcome = new WelcomeViewModel(CoreVersion, recent, OpenRecentCommand, Commands["file.connect"]);
+        OpenDocument(_welcome);
 
         logger.LogInformation("Brezee started (core v{CoreVersion})", CoreVersion);
     }
 
     public CommandRegistry Commands { get; }
+
+    // Recently used databases, newest first (File > Recent Connections and the welcome page).
+    public RecentConnections Recent { get; }
 
     public string CoreVersion { get; }
 
@@ -90,6 +97,13 @@ public sealed partial class ShellViewModel : ObservableObject
     {
         if (_coordinator.ConnectNew() is not null)
             explorer.Show();
+    }
+
+    [RelayCommand]
+    private async Task OpenRecentAsync(RecentConnection recent)
+    {
+        if (await _coordinator.ConnectRecentAsync(recent) is not null)
+            _explorer.Show();
     }
 
     private void OnDocumentCloseRequested(object? sender, EventArgs e)

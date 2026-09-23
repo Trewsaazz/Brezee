@@ -37,6 +37,26 @@
                 <MenuItem Command="{Binding Commands[file.connect]}" />
                 <MenuItem Command="{Binding Commands[database.disconnect]}" />
                 <Separator />
+                <MenuItem Header="{x:Static res:Strings.Menu_RecentConnections}"
+                          ItemsSource="{Binding Recent.Items}"
+                          IsEnabled="{Binding Recent.Items.Count, Converter={x:Static shell:NonZeroConverter.Instance}}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Header">
+                                <Setter.Value>
+                                    <TextBlock>
+                                        <Run Text="{Binding Name, Mode=OneWay}" />
+                                        <Run Text="{Binding Location, Mode=OneWay}" Foreground="Gray" />
+                                    </TextBlock>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="ToolTip" Value="{Binding Database}" />
+                            <Setter Property="Command" Value="{Binding DataContext.OpenRecentCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <Separator />
                 <MenuItem Command="{Binding Commands[file.exit]}" />
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.Menu_View}">

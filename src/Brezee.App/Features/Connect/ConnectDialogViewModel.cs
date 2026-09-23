@@ -83,12 +83,17 @@ public sealed partial class ConnectDialogViewModel : ObservableObject
     // Raised after a successful connect so the view can close.
     public event EventHandler? Connected;
 
-    // Pre-fills the form from a saved connection; only the password is left to enter.
-    public void LoadFrom(SavedConnection connection)
+    // Pre-fills the form; only the password is left to enter. With isSaved, the dialog is for that
+    // saved connection (and can update its password); otherwise the details are just a starting point.
+    public void LoadFrom(SavedConnection connection, bool isSaved = true)
     {
-        _prefill = connection;
-        IsForSavedConnection = true;
-        RememberPassword = connection.HasSavedPassword;
+        if (isSaved)
+        {
+            _prefill = connection;
+            IsForSavedConnection = true;
+            RememberPassword = connection.HasSavedPassword;
+        }
+
         ConnectionName = connection.Name;
         IsLocal = connection.IsLocal;
         Host = connection.Host;

@@ -56,10 +56,13 @@ public sealed class FakeDialogService : IDialogService
 
     public List<string?> ConnectDialogErrors { get; } = [];
 
-    public ConnectResult? ShowConnectDialog(SavedConnection? prefill, string? error = null)
+    public List<bool> ConnectDialogPrefillIsSaved { get; } = [];
+
+    public ConnectResult? ShowConnectDialog(SavedConnection? prefill, string? error = null, bool prefillIsSaved = true)
     {
         ConnectDialogPrefills.Add(prefill);
         ConnectDialogErrors.Add(error);
+        ConnectDialogPrefillIsSaved.Add(prefillIsSaved);
         return ConnectResult;
     }
 }
@@ -82,17 +85,32 @@ public sealed class TempSavedConnections : IDisposable
     {
         Store = new ConnectionStore(Path.Combine(_directory, "connections.json"), NullLogger<ConnectionStore>.Instance);
         Saved = new SavedConnections(Store, NullLogger<SavedConnections>.Instance);
+        RecentStore = new RecentConnectionStore(Path.Combine(_directory, "recent.json"), NullLogger<RecentConnectionStore>.Instance);
     }
 
     public ConnectionStore Store { get; }
 
     public SavedConnections Saved { get; }
 
+    public RecentConnectionStore RecentStore { get; }
+
+    public ManualTime Time { get; } = new();
+
+    public RecentConnections CreateRecent(ConnectionManager connections) => new(RecentStore, connections, Saved, Time);
+
     public void Dispose()
     {
         if (Directory.Exists(_directory))
             Directory.Delete(_directory, recursive: true);
     }
+}
+
+// A clock the test controls; each read moves it one minute forward so entries get distinct times.
+public sealed class ManualTime : TimeProvider
+{
+    public DateTimeOffset Now { get; set; } = new(2026, 9, 23, 12, 0, 0, TimeSpan.Zero);
+
+    public override DateTimeOffset GetUtcNow() => Now = Now.AddMinutes(1);
 }
 
 public static class TestData

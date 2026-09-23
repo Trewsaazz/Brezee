@@ -79,4 +79,25 @@ public sealed class ConnectionStoreTests : IDisposable
         Assert.False(File.Exists(Store.FilePath));
         Assert.Equal("{ this is not json", File.ReadAllText(Store.FilePath + ".bad"));
     }
+
+    [Fact]
+    public void Load_ReadsTheFileFormatWrittenByEarlierVersions()
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(Store.FilePath)!);
+        File.WriteAllText(Store.FilePath, """
+            {
+              "version": 1,
+              "connections": [
+                { "id": "3f2504e0-4f89-11d3-9a0c-0305e82c3301", "name": "Employee", "isLocal": false,
+                  "host": "localhost", "port": 3050, "database": "employee", "user": "SYSDBA",
+                  "role": "", "charset": "UTF8" }
+              ]
+            }
+            """);
+
+        var loaded = Assert.Single(Store.Load());
+
+        Assert.Equal("Employee", loaded.Name);
+        Assert.Null(loaded.ProtectedPassword);
+    }
 }
