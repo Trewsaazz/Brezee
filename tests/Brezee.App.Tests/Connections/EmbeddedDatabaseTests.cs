@@ -66,6 +66,9 @@ public sealed class EmbeddedDatabaseTests : IDisposable
         var error = Assert.Throws<CoreException>(() => DatabaseConnection.Open(Local));
 
         Assert.Equal(CoreErrorKind.Connection, error.Kind);
-        Assert.Contains(Path.GetFileName(_path), error.Message);
+        // Firebird normalizes Windows paths (8.3 short names, letter case), so compare the file name loosely.
+        var fileName = Path.GetFileNameWithoutExtension(_path);
+        Assert.True(error.Message.Contains(fileName, StringComparison.OrdinalIgnoreCase),
+            $"Expected the error to name {fileName}. Message: {error.Message}");
     }
 }
