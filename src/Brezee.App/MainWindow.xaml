@@ -9,9 +9,10 @@
         xmlns:commands="clr-namespace:Brezee.App.Commands"
         xmlns:avalonDockThemes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2013"
         xmlns:shell="clr-namespace:Brezee.App.Shell"
+        xmlns:res="clr-namespace:Brezee.App.Resources"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance shell:ShellViewModel}"
-        Title="Brezee"
+        Title="{x:Static res:Strings.App_Name}"
         Width="1280" Height="800"
         MinWidth="640" MinHeight="400"
         WindowStartupLocation="CenterScreen">
@@ -32,10 +33,10 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
+            <MenuItem Header="{x:Static res:Strings.Menu_File}">
                 <MenuItem Command="{Binding Commands[file.exit]}" />
             </MenuItem>
-            <MenuItem Header="_View">
+            <MenuItem Header="{x:Static res:Strings.Menu_View}">
                 <MenuItem Command="{Binding Commands[view.explorer]}" />
                 <MenuItem Command="{Binding Commands[view.output]}" />
                 <Separator />
@@ -44,10 +45,10 @@
         </Menu>
 
         <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="Ready" />
+            <StatusBarItem Content="{x:Static res:Strings.Status_Ready}" />
             <StatusBarItem HorizontalAlignment="Right"
                            Content="{Binding CoreVersion}"
-                           ContentStringFormat="Core v{0}" />
+                           ContentStringFormat="{x:Static res:Strings.App_CoreVersion}" />
         </StatusBar>
 
         <avalonDock:DockingManager AnchorablesSource="{Binding Tools}"

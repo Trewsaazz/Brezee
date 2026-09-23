@@ -1,3 +1,4 @@
+using Brezee.App.Resources;
 using Brezee.App.Shell;
 
 namespace Brezee.App.Features.Welcome;
@@ -6,7 +7,7 @@ namespace Brezee.App.Features.Welcome;
 public sealed class WelcomeViewModel : DocumentViewModel
 {
     public WelcomeViewModel(string coreVersion)
-        : base("welcome", "Welcome")
+        : base("welcome", Strings.Welcome_Title)
     {
         CoreVersion = coreVersion;
     }

@@ -1,8 +1,9 @@
 <UserControl x:Class="Brezee.App.Features.Explorer.ExplorerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:Brezee.App.Resources">
     <Grid>
-        <TextBlock Text="No connections yet"
+        <TextBlock Text="{x:Static res:Strings.Explorer_NoConnections}"
                    Foreground="Gray"
                    HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>

@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using Brezee.App.Commands;
 using Brezee.App.Features.Explorer;
 using Brezee.App.Features.Output;
 using Brezee.App.Features.Welcome;
+using Brezee.App.Resources;
 using Brezee.Bridge;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -27,7 +29,7 @@ public sealed partial class ShellViewModel : ObservableObject
 
         RegisterCommands(explorer, output);
 
-        output.WriteLine($"Brezee started (core v{CoreVersion}).");
+        output.WriteLine(string.Format(CultureInfo.CurrentCulture, Strings.Output_Started, CoreVersion));
     }
 
     public CommandRegistry Commands { get; }
@@ -54,18 +56,18 @@ public sealed partial class ShellViewModel : ObservableObject
 
     private void RegisterCommands(ExplorerViewModel explorer, OutputViewModel output)
     {
-        Commands.Register("file.exit", "E_xit",
+        Commands.Register("file.exit", Strings.Command_FileExit,
             new RelayCommand(() => Application.Current.Shutdown()));
 
-        Commands.Register("view.explorer", "Database _Explorer",
+        Commands.Register("view.explorer", Strings.Command_ViewExplorer,
             new RelayCommand(explorer.Show),
             new KeyGesture(Key.L, ModifierKeys.Control | ModifierKeys.Alt));
 
-        Commands.Register("view.output", "_Output",
+        Commands.Register("view.output", Strings.Command_ViewOutput,
             new RelayCommand(output.Show),
             new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Alt));
 
-        Commands.Register("view.welcome", "_Welcome Page",
+        Commands.Register("view.welcome", Strings.Command_ViewWelcome,
             new RelayCommand(() => OpenDocument(_welcome)));
     }
 

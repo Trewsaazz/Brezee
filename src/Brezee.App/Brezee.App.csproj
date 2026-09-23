@@ -11,7 +11,33 @@
     <PlatformTarget>x64</PlatformTarget>
     <RootNamespace>Brezee.App</RootNamespace>
     <AssemblyName>Brezee</AssemblyName>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
+
+  <!--
+    The Strings class (Brezee.App.Resources.Strings) is generated from Resources\Strings.resx at build
+    time, so no designer file is checked in and the resx can be edited in any editor.
+    It is generated before XAML compilation and included as a normal Compile item, so WPF's temporary
+    markup-compilation project can also resolve {x:Static res:Strings.*}.
+  -->
+  <ItemGroup>
+    <Compile Include="$(IntermediateOutputPath)Strings.g.cs" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="GenerateStringsClass"
+          BeforeTargets="MarkupCompilePass1;CoreCompile"
+          Inputs="Resources\Strings.resx"
+          Outputs="$(IntermediateOutputPath)Strings.g.cs">
+    <GenerateResource Sources="Resources\Strings.resx"
+                      OutputResources="$(IntermediateOutputPath)Strings.codegen.resources"
+                      StronglyTypedLanguage="CSharp"
+                      StronglyTypedNamespace="Brezee.App.Resources"
+                      StronglyTypedClassName="Strings"
+                      StronglyTypedManifestPrefix="Brezee.App.Resources"
+                      StronglyTypedFileName="$(IntermediateOutputPath)Strings.g.cs"
+                      PublicClass="true"
+                      ExecuteAsTool="false" />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />

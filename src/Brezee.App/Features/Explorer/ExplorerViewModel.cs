@@ -1,3 +1,4 @@
+using Brezee.App.Resources;
 using Brezee.App.Shell;
 
 namespace Brezee.App.Features.Explorer;
@@ -6,7 +7,7 @@ namespace Brezee.App.Features.Explorer;
 public sealed class ExplorerViewModel : ToolViewModel
 {
     public ExplorerViewModel()
-        : base("explorer", "Database Explorer", ToolLocation.Left)
+        : base("explorer", Strings.Explorer_Title, ToolLocation.Left)
     {
     }
 }

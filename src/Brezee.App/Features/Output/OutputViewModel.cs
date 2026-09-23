@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Brezee.App.Resources;
 using Brezee.App.Shell;
 
 namespace Brezee.App.Features.Output;
@@ -7,7 +8,7 @@ namespace Brezee.App.Features.Output;
 public sealed class OutputViewModel : ToolViewModel
 {
     public OutputViewModel()
-        : base("output", "Output", ToolLocation.Bottom)
+        : base("output", Strings.Output_Title, ToolLocation.Bottom)
     {
     }
 

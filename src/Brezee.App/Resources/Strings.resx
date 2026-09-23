@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  All user-visible text in the Brezee app (English, the neutral language).
+  Key convention: Area_Name. An underscore inside a value marks a menu access key.
+  To translate, add Strings.<culture>.resx (e.g. Strings.es.resx) with the same keys.
+-->
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Application -->
+  <data name="App_Name" xml:space="preserve">
+    <value>Brezee</value>
+  </data>
+  <data name="App_Tagline" xml:space="preserve">
+    <value>A modern desktop client for Firebird SQL</value>
+  </data>
+  <data name="App_CoreVersion" xml:space="preserve">
+    <value>Core v{0}</value>
+    <comment>{0} = version of the native core, e.g. 0.1.0</comment>
+  </data>
+
+  <!-- Menus -->
+  <data name="Menu_File" xml:space="preserve">
+    <value>_File</value>
+  </data>
+  <data name="Menu_View" xml:space="preserve">
+    <value>_View</value>
+  </data>
+
+  <!-- Commands -->
+  <data name="Command_FileExit" xml:space="preserve">
+    <value>E_xit</value>
+  </data>
+  <data name="Command_ViewExplorer" xml:space="preserve">
+    <value>Database _Explorer</value>
+  </data>
+  <data name="Command_ViewOutput" xml:space="preserve">
+    <value>_Output</value>
+  </data>
+  <data name="Command_ViewWelcome" xml:space="preserve">
+    <value>_Welcome Page</value>
+  </data>
+
+  <!-- Status bar -->
+  <data name="Status_Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+
+  <!-- Database Explorer panel -->
+  <data name="Explorer_Title" xml:space="preserve">
+    <value>Database Explorer</value>
+  </data>
+  <data name="Explorer_NoConnections" xml:space="preserve">
+    <value>No connections yet</value>
+  </data>
+
+  <!-- Output panel -->
+  <data name="Output_Title" xml:space="preserve">
+    <value>Output</value>
+  </data>
+  <data name="Output_Started" xml:space="preserve">
+    <value>Brezee started (core v{0}).</value>
+    <comment>{0} = version of the native core</comment>
+  </data>
+
+  <!-- Welcome page -->
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+</root>
