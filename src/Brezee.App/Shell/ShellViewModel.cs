@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using Brezee.App.Commands;
@@ -10,6 +9,7 @@ using Brezee.App.Resources;
 using Brezee.Bridge;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 
 namespace Brezee.App.Shell;
 
@@ -17,7 +17,7 @@ public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly WelcomeViewModel _welcome;
 
-    public ShellViewModel(CommandRegistry commands, ExplorerViewModel explorer, OutputViewModel output)
+    public ShellViewModel(CommandRegistry commands, ExplorerViewModel explorer, OutputViewModel output, ILogger<ShellViewModel> logger)
     {
         Commands = commands;
         CoreVersion = CoreInfo.Version;
@@ -29,7 +29,7 @@ public sealed partial class ShellViewModel : ObservableObject
 
         RegisterCommands(explorer, output);
 
-        output.WriteLine(string.Format(CultureInfo.CurrentCulture, Strings.Output_Started, CoreVersion));
+        logger.LogInformation("Brezee started (core v{CoreVersion})", CoreVersion);
     }
 
     public CommandRegistry Commands { get; }

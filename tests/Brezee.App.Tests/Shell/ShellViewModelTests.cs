@@ -3,21 +3,28 @@ using Brezee.App.Features.Explorer;
 using Brezee.App.Features.Output;
 using Brezee.App.Features.Welcome;
 using Brezee.App.Shell;
+using Brezee.App.Tests.Support;
+using Microsoft.Extensions.Logging;
 
 namespace Brezee.App.Tests.Shell;
 
 // These tests also exercise the real C++/CLI bridge and native core (ShellViewModel reads CoreInfo.Version).
-public class ShellViewModelTests
+public sealed class ShellViewModelTests : IDisposable
 {
     private readonly CommandRegistry _commands = new();
     private readonly ExplorerViewModel _explorer = new();
     private readonly OutputViewModel _output = new();
+    private readonly CapturingLoggerProvider _logs = new();
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ShellViewModel _shell;
 
     public ShellViewModelTests()
     {
-        _shell = new ShellViewModel(_commands, _explorer, _output);
+        _loggerFactory = _logs.CreateFactory();
+        _shell = new ShellViewModel(_commands, _explorer, _output, _loggerFactory.CreateLogger<ShellViewModel>());
     }
+
+    public void Dispose() => _loggerFactory.Dispose();
 
     [Fact]
     public void Startup_OpensWelcomePage()
@@ -39,10 +46,11 @@ public class ShellViewModelTests
     }
 
     [Fact]
-    public void Startup_LogsToOutputPanel()
+    public void Startup_LogsCoreVersion()
     {
-        var line = Assert.Single(_output.Lines);
-        Assert.Contains(_shell.CoreVersion, line);
+        var entry = Assert.Single(_logs.Entries);
+        Assert.Equal(LogLevel.Information, entry.Level);
+        Assert.Contains(_shell.CoreVersion, entry.Message);
     }
 
     [Theory]
