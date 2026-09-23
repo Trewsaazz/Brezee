@@ -28,7 +28,7 @@ Nothing here is set in stone — phases can reorder, and some items may get cut 
 
 - [x] Connect to a Firebird server (host/port/path/credentials)
 - [x] Embedded mode support — open a `.fdb` file directly, no running server needed
-- [ ] Saved connections / database registration (alias list, like a bookmarks panel)
+- [x] Saved connections / database registration (alias list, like a bookmarks panel)
 - [ ] Secure credential storage for saved passwords (Windows DPAPI, never plain text)
 - [ ] Recent connections list
 - [ ] Multiple simultaneous database connections (tabs or separate windows)
