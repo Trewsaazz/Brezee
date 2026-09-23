@@ -1,10 +1,66 @@
 <UserControl x:Class="Brezee.App.Features.Explorer.ExplorerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:res="clr-namespace:Brezee.App.Resources">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Brezee.App.Features.Explorer"
+             xmlns:res="clr-namespace:Brezee.App.Resources"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance local:ExplorerViewModel}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </UserControl.Resources>
+
     <Grid>
         <TextBlock Text="{x:Static res:Strings.Explorer_NoConnections}"
                    Foreground="Gray"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"
+                   Margin="16"
+                   HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasDatabases}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <ListBox ItemsSource="{Binding Databases}"
+                 SelectedItem="{Binding SelectedDatabase}"
+                 BorderThickness="0"
+                 HorizontalContentAlignment="Stretch"
+                 Visibility="{Binding HasDatabases, Converter={StaticResource BoolToVisibility}}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type local:DatabaseNodeViewModel}">
+                    <StackPanel Margin="2,3" ToolTip="{Binding Details}">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        <TextBlock Foreground="Gray" FontSize="11">
+                            <Run Text="{Binding Location, Mode=OneWay}" />
+                            <Run Text=" · " />
+                            <Run Text="{Binding ServerVersion, Mode=OneWay}" />
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="{x:Static res:Strings.Command_Disconnect}"
+                                          Command="{Binding PlacementTarget.Tag.DisconnectCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandParameter="{Binding}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                    <!-- The context menu reaches the explorer view model through Tag. -->
+                    <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
     </Grid>
 </UserControl>

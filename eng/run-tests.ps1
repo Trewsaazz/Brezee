@@ -16,6 +16,17 @@ param(
 $root = Split-Path -Parent $PSScriptRoot
 $onCi = $env:GITHUB_ACTIONS -eq 'true'
 
+# The core's integration tests run against the embedded engine in the Firebird kit the build downloads.
+$kit = Get-ChildItem (Join-Path $root 'third_party/firebird') -Directory -ErrorAction SilentlyContinue |
+    Where-Object { Test-Path (Join-Path $_.FullName 'fbclient.dll') } |
+    Sort-Object Name -Descending | Select-Object -First 1
+if (-not $kit) {
+    Write-Host 'Firebird kit not found in third_party/firebird. Build the solution first; it downloads the kit.'
+    if ($onCi) { Write-Host '::error title=Tests::Firebird kit not found in third_party/firebird' }
+    exit 1
+}
+$env:BREZEE_FIREBIRD_ROOT = $kit.FullName
+
 $suites = @(
     @{ Name = 'Core'; Path = "x64/$Configuration/Brezee.Core.Tests.exe" }
     @{ Name = 'App';  Path = "tests/Brezee.App.Tests/bin/x64/$Configuration/net10.0-windows/Brezee.App.Tests.exe" }

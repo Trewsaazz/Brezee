@@ -39,6 +39,12 @@
   </data>
 
   <!-- Commands -->
+  <data name="Command_FileConnect" xml:space="preserve">
+    <value>_Connect to Database…</value>
+  </data>
+  <data name="Command_Disconnect" xml:space="preserve">
+    <value>_Disconnect</value>
+  </data>
   <data name="Command_FileExit" xml:space="preserve">
     <value>E_xit</value>
   </data>
@@ -62,7 +68,17 @@
     <value>Database Explorer</value>
   </data>
   <data name="Explorer_NoConnections" xml:space="preserve">
-    <value>No connections yet</value>
+    <value>No connections yet. Use File → Connect to Database… to open one.</value>
+  </data>
+  <data name="Explorer_Local" xml:space="preserve">
+    <value>local</value>
+    <comment>Location shown for a database opened without a server</comment>
+  </data>
+  <data name="Explorer_DatabaseDetails" xml:space="preserve">
+    <value>{0}
+{1}
+ODS {2}.{3} · {4} byte pages</value>
+    <comment>{0} = database path, {1} = server version, {2}.{3} = on-disk structure version, {4} = page size</comment>
   </data>
 
   <!-- Output panel -->
@@ -73,6 +89,43 @@
   <!-- Welcome page -->
   <data name="Welcome_Title" xml:space="preserve">
     <value>Welcome</value>
+  </data>
+
+  <!-- Connect dialog -->
+  <data name="Connect_Title" xml:space="preserve">
+    <value>Connect to Database</value>
+  </data>
+  <data name="Connect_Server" xml:space="preserve">
+    <value>_Server</value>
+  </data>
+  <data name="Connect_Port" xml:space="preserve">
+    <value>_Port</value>
+  </data>
+  <data name="Connect_Database" xml:space="preserve">
+    <value>_Database</value>
+  </data>
+  <data name="Connect_DatabaseHint" xml:space="preserve">
+    <value>File path on the server (e.g. C:\Data\employee.fdb) or an alias from databases.conf</value>
+  </data>
+  <data name="Connect_User" xml:space="preserve">
+    <value>_User</value>
+  </data>
+  <data name="Connect_Password" xml:space="preserve">
+    <value>Pass_word</value>
+  </data>
+  <data name="Connect_Role" xml:space="preserve">
+    <value>_Role</value>
+  </data>
+  <data name="Connect_Charset" xml:space="preserve">
+    <value>C_harset</value>
+  </data>
+  <data name="Connect_Connect" xml:space="preserve">
+    <value>_Connect</value>
+  </data>
+
+  <!-- Common -->
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
 
   <!-- Errors -->

@@ -1,5 +1,5 @@
 #include "CoreRuntime.h"
-#include "CallCore.h"
+#include "CoreErrors.h"
 #include "Interop.h"
 
 #include <brezee/core/log.h>
@@ -7,13 +7,12 @@
 
 #include <vcclr.h>
 
-// Lambdas are not allowed inside member functions of managed classes (C3923), so the native pieces
-// live here as free functions and a function object.
 namespace {
 
 using namespace Brezee::Bridge;
 
-// Core log sink that forwards to a managed handler.
+// Core log sink that forwards to a managed handler. A named type rather than a lambda: lambdas are
+// not allowed inside member functions of managed classes (C3923).
 struct ManagedLogSink
 {
     gcroot<CoreLogHandler^> handler;
@@ -32,11 +31,6 @@ struct ManagedLogSink
     }
 };
 
-void InitializeCore()
-{
-    CallCore([] { brezee::core::initialize(); });
-}
-
 } // namespace
 
 namespace Brezee::Bridge {
@@ -47,7 +41,15 @@ void CoreRuntime::Initialize(CoreLogHandler^ logHandler)
         throw gcnew System::ArgumentNullException("logHandler");
 
     brezee::core::set_log_sink(ManagedLogSink{logHandler});
-    InitializeCore();
+
+    try
+    {
+        brezee::core::initialize();
+    }
+    catch (const std::exception& e)
+    {
+        throw ToManagedException(e);
+    }
 }
 
 void CoreRuntime::Shutdown()

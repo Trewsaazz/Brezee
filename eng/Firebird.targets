@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Downloads and unpacks the Firebird kit described in Firebird.props, verifying its SHA-256.
+  Imported only by Brezee.Core, which every other project builds after, so the download runs once.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="FetchFirebirdKit"
+          BeforeTargets="PrepareForBuild"
+          Condition="!Exists('$(FirebirdKitDir).complete')">
+    <Message Importance="high" Text="Downloading Firebird $(FirebirdVersion) kit..." />
+
+    <DownloadFile SourceUrl="$(FirebirdKitUrl)"
+                  DestinationFolder="$(FirebirdKitDir)..\download"
+                  Retries="3">
+      <Output TaskParameter="DownloadedFile" ItemName="_FirebirdKitArchive" />
+    </DownloadFile>
+
+    <VerifyFileHash File="@(_FirebirdKitArchive)" Hash="$(FirebirdKitSha256)" Algorithm="SHA256" />
+
+    <RemoveDir Directories="$(FirebirdKitDir)" />
+    <Unzip SourceFiles="@(_FirebirdKitArchive)" DestinationFolder="$(FirebirdKitDir)" />
+    <Touch Files="$(FirebirdKitDir).complete" AlwaysCreate="true" />
+    <Delete Files="@(_FirebirdKitArchive)" />
+  </Target>
+</Project>

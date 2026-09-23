@@ -36,6 +36,10 @@ jobs:
             }
           }
 
+      - name: Start Firebird server for network tests
+        shell: pwsh
+        run: ./eng/start-test-server.ps1
+
       - name: Run tests
         shell: pwsh
         run: ./eng/run-tests.ps1 -Configuration ${{ matrix.configuration }}

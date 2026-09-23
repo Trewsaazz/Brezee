@@ -92,3 +92,6 @@ packages/
 # Rider / VS Code
 .idea/
 .vscode/
+
+# Downloaded Firebird kit (see eng/Firebird.props)
+third_party/firebird/

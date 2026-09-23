@@ -19,10 +19,10 @@ public sealed class CoreRuntimeTests : IDisposable
 
         CoreRuntime.Initialize((level, category, message) => received.Add((level, category, message)));
 
-        var (level, category, message) = Assert.Single(received);
-        Assert.Equal(CoreLogLevel.Info, level);
-        Assert.Equal("Runtime", category);
-        Assert.Contains("initialized", message);
+        Assert.Contains(received, m =>
+            m.Level == CoreLogLevel.Info && m.Category == "Runtime" && m.Message.Contains("Firebird client"));
+        Assert.Contains(received, m =>
+            m.Level == CoreLogLevel.Info && m.Category == "Runtime" && m.Message.Contains("initialized"));
     }
 
     [Fact]
@@ -34,9 +34,12 @@ public sealed class CoreRuntimeTests : IDisposable
 
         CoreRuntime.Initialize(forwarder.Log);
 
-        var entry = Assert.Single(capture.Entries);
-        Assert.Equal("Core.Runtime", entry.Category);
-        Assert.Equal(LogLevel.Information, entry.Level);
+        Assert.NotEmpty(capture.Entries);
+        Assert.All(capture.Entries, entry =>
+        {
+            Assert.Equal("Core.Runtime", entry.Category);
+            Assert.Equal(LogLevel.Information, entry.Level);
+        });
     }
 
     [Fact]
@@ -51,12 +54,14 @@ public sealed class CoreRuntimeTests : IDisposable
         var first = 0;
         CoreRuntime.Initialize((_, _, _) => first++);
         CoreRuntime.Shutdown();
+        var firstAfterShutdown = first;
 
         var second = 0;
         CoreRuntime.Initialize((_, _, _) => second++);
 
-        Assert.Equal(1, first);  // Nothing more after Shutdown.
-        Assert.Equal(1, second);
+        Assert.True(firstAfterShutdown > 0);
+        Assert.Equal(firstAfterShutdown, first); // The first handler heard nothing after Shutdown.
+        Assert.True(second > 0);
     }
 
     [Fact]

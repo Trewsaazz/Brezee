@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Firebird kit Brezee builds against: public headers, fbclient and (later) the embedded engine.
+  Downloaded once by Firebird.targets into third_party/firebird/<version>/ (not checked in).
+  To upgrade: change the version, URL and SHA-256 together.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <FirebirdVersion>5.0.4.1812</FirebirdVersion>
+    <FirebirdKitUrl>https://github.com/FirebirdSQL/firebird/releases/download/v5.0.4/Firebird-5.0.4.1812-0-windows-x64.zip</FirebirdKitUrl>
+    <FirebirdKitSha256>01E844FCE4D5F53272A76205DBC3A1BA4B782AB8E8EADCD808CDBCCD9CE13B72</FirebirdKitSha256>
+    <FirebirdKitDir>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)..\third_party\firebird\$(FirebirdVersion)'))</FirebirdKitDir>
+    <FirebirdIncludeDir>$(FirebirdKitDir)include\</FirebirdIncludeDir>
+  </PropertyGroup>
+</Project>

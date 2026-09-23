@@ -53,4 +53,11 @@
     <ProjectReference Include="..\Brezee.Bridge\Brezee.Bridge.vcxproj" />
   </ItemGroup>
 
+  <!-- Firebird client runtime, from the kit Brezee.Core downloads (see eng/Firebird.props). -->
+  <Import Project="..\..\eng\Firebird.props" />
+  <ItemGroup>
+    <None Include="$(FirebirdKitDir)fbclient.dll" Link="fbclient.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+    <None Include="$(FirebirdKitDir)firebird.msg" Link="firebird.msg" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
 </Project>

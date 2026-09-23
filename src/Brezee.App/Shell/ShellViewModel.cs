@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using Brezee.App.Commands;
+using Brezee.App.Connections;
 using Brezee.App.Features.Explorer;
 using Brezee.App.Features.Output;
 using Brezee.App.Features.Welcome;
@@ -16,10 +17,20 @@ namespace Brezee.App.Shell;
 public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly WelcomeViewModel _welcome;
+    private readonly IDialogService _dialogs;
+    private readonly ConnectionManager _connections;
 
-    public ShellViewModel(CommandRegistry commands, ExplorerViewModel explorer, OutputViewModel output, ILogger<ShellViewModel> logger)
+    public ShellViewModel(
+        CommandRegistry commands,
+        IDialogService dialogs,
+        ConnectionManager connections,
+        ExplorerViewModel explorer,
+        OutputViewModel output,
+        ILogger<ShellViewModel> logger)
     {
         Commands = commands;
+        _dialogs = dialogs;
+        _connections = connections;
         CoreVersion = CoreInfo.Version;
 
         Tools = [explorer, output];
@@ -56,6 +67,13 @@ public sealed partial class ShellViewModel : ObservableObject
 
     private void RegisterCommands(ExplorerViewModel explorer, OutputViewModel output)
     {
+        Commands.Register("file.connect", Strings.Command_FileConnect,
+            new RelayCommand(() => Connect(explorer)),
+            new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Shift));
+
+        Commands.Register("database.disconnect", Strings.Command_Disconnect,
+            explorer.DisconnectCommand);
+
         Commands.Register("file.exit", Strings.Command_FileExit,
             new RelayCommand(() => Application.Current.Shutdown()));
 
@@ -69,6 +87,15 @@ public sealed partial class ShellViewModel : ObservableObject
 
         Commands.Register("view.welcome", Strings.Command_ViewWelcome,
             new RelayCommand(() => OpenDocument(_welcome)));
+    }
+
+    private void Connect(ExplorerViewModel explorer)
+    {
+        if (_dialogs.ShowConnectDialog() is not { } session)
+            return;
+
+        _connections.Add(session);
+        explorer.Show();
     }
 
     private void OnDocumentCloseRequested(object? sender, EventArgs e)

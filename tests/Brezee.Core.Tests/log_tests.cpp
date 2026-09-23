@@ -1,8 +1,11 @@
 #include <brezee/core/log.h>
 #include <brezee/core/runtime.h>
 
+#include "test_support.h"
+
 #include <doctest.h>
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -86,14 +89,18 @@ TEST_CASE("a sink may replace itself while handling a message")
     CHECK(calls == 1);
 }
 
-TEST_CASE("initialize logs that the core started")
+TEST_CASE("initialize logs the Firebird client and that the core started")
 {
     CapturingSink sink;
 
-    brezee::core::initialize();
+    test_support::initialize_core();
 
-    REQUIRE(sink.entries.size() == 1);
-    CHECK(sink.entries[0].level == LogLevel::Info);
-    CHECK(sink.entries[0].category == "Runtime");
-    CHECK(sink.entries[0].message.find("initialized") != std::string::npos);
+    const auto logged = [&](std::string_view text) {
+        return std::any_of(sink.entries.begin(), sink.entries.end(), [&](const Entry& entry) {
+            return entry.level == LogLevel::Info && entry.category == "Runtime"
+                && entry.message.find(text) != std::string::npos;
+        });
+    };
+    CHECK(logged("Firebird client"));
+    CHECK(logged("initialized"));
 }

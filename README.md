@@ -130,6 +130,9 @@ detailed plan lives in the [roadmap](roadmap.md), and this section will grow as 
 
 Open `Brezee.sln` in Visual Studio, select the `x64` platform, and press <kbd>F5</kbd>.
 
+The first build downloads the official Firebird 5.0.4 kit (about 25 MB) into `third_party/firebird/`
+and checks its SHA-256. Brezee uses its headers and ships its client library, `fbclient.dll`.
+
 Or build from a *Developer PowerShell for VS 2026*:
 
 ```powershell
@@ -144,8 +147,11 @@ msbuild Brezee.sln -restore -p:Configuration=Release -p:Platform=x64
 
 | Suite | Framework | Covers |
 | ----- | --------- | ------ |
-| `tests/Brezee.Core.Tests` | [doctest](https://github.com/doctest/doctest) | Native C++ core |
+| `tests/Brezee.Core.Tests` | [doctest](https://github.com/doctest/doctest) | Native C++ core, including real databases through Firebird's embedded engine |
 | `tests/Brezee.App.Tests` | [xUnit v3](https://xunit.net/) | View models and commands, plus the C++/CLI bridge end to end |
+
+Network tests against a real server run when `BREZEE_TEST_SERVER` is set:
+`./eng/start-test-server.ps1` starts one from the kit (CI always does this).
 
 The xUnit suite also shows up in Visual Studio's Test Explorer. The doctest suite is a plain
 executable (`x64\<Configuration>\Brezee.Core.Tests.exe`), so set it as the startup project to debug it.

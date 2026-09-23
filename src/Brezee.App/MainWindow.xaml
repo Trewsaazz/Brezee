@@ -34,6 +34,9 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="{x:Static res:Strings.Menu_File}">
+                <MenuItem Command="{Binding Commands[file.connect]}" />
+                <MenuItem Command="{Binding Commands[database.disconnect]}" />
+                <Separator />
                 <MenuItem Command="{Binding Commands[file.exit]}" />
             </MenuItem>
             <MenuItem Header="{x:Static res:Strings.Menu_View}">

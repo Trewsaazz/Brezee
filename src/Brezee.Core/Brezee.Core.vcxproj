@@ -33,21 +33,32 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Brezee.Cpp.props" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Firebird.props" />
+  <PropertyGroup>
+    <!-- Firebird headers are third-party: their warnings are not ours to fix. -->
+    <ExternalIncludePath>$(FirebirdIncludeDir);$(ExternalIncludePath)</ExternalIncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\brezee\core\connection.h" />
     <ClInclude Include="include\brezee\core\error.h" />
     <ClInclude Include="include\brezee\core\log.h" />
     <ClInclude Include="include\brezee\core\runtime.h" />
     <ClInclude Include="include\brezee\core\version.h" />
+    <ClInclude Include="src\firebird\client.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\connection.cpp" />
+    <ClCompile Include="src\firebird\client.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\runtime.cpp" />
     <ClCompile Include="src\version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Firebird.targets" />
 </Project>

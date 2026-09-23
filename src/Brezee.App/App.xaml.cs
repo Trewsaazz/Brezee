@@ -1,5 +1,6 @@
 using System.Windows;
 using Brezee.App.Commands;
+using Brezee.App.Connections;
 using Brezee.App.Diagnostics;
 using Brezee.App.Features.Explorer;
 using Brezee.App.Features.Output;
@@ -45,6 +46,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        // Disconnect while the core can still log, then detach the log sink.
+        _services?.GetService<ConnectionManager>()?.Dispose();
         CoreRuntime.Shutdown();
         _services?.GetService<ILogger<App>>()?.LogInformation("Brezee exiting with code {ExitCode}", e.ApplicationExitCode);
         _services?.Dispose(); // Flushes the log files.
@@ -71,8 +74,13 @@ public partial class App : Application
         services.AddSingleton<CoreLogForwarder>();
         services.AddSingleton<ErrorHandler>();
 
+        // Connections
+        services.AddSingleton<IDatabaseConnector, FirebirdConnector>();
+        services.AddSingleton<ConnectionManager>();
+
         // Shell
         services.AddSingleton<CommandRegistry>();
+        services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<MainWindow>();
 

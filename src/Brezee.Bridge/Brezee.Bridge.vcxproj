@@ -45,15 +45,17 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CallCore.h" />
+    <ClInclude Include="CoreErrors.h" />
     <ClInclude Include="CoreException.h" />
     <ClInclude Include="CoreInfo.h" />
     <ClInclude Include="CoreRuntime.h" />
+    <ClInclude Include="DatabaseConnection.h" />
     <ClInclude Include="Interop.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CoreInfo.cpp" />
     <ClCompile Include="CoreRuntime.cpp" />
+    <ClCompile Include="DatabaseConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Brezee.Core\Brezee.Core.vcxproj">
