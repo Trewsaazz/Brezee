@@ -88,6 +88,48 @@
   <data name="Explorer_Connecting" xml:space="preserve">
     <value>connecting…</value>
   </data>
+  <data name="Explorer_Tables" xml:space="preserve">
+    <value>Tables</value>
+  </data>
+  <data name="Explorer_Views" xml:space="preserve">
+    <value>Views</value>
+  </data>
+  <data name="Explorer_Procedures" xml:space="preserve">
+    <value>Stored Procedures</value>
+  </data>
+  <data name="Explorer_Functions" xml:space="preserve">
+    <value>Functions</value>
+  </data>
+  <data name="Explorer_Packages" xml:space="preserve">
+    <value>Packages</value>
+  </data>
+  <data name="Explorer_Triggers" xml:space="preserve">
+    <value>Triggers</value>
+  </data>
+  <data name="Explorer_Generators" xml:space="preserve">
+    <value>Generators</value>
+  </data>
+  <data name="Explorer_Domains" xml:space="preserve">
+    <value>Domains</value>
+  </data>
+  <data name="Explorer_Exceptions" xml:space="preserve">
+    <value>Exceptions</value>
+  </data>
+  <data name="Explorer_Roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="Explorer_Indices" xml:space="preserve">
+    <value>Indices</value>
+  </data>
+  <data name="Explorer_Loading" xml:space="preserve">
+    <value>Loading…</value>
+  </data>
+  <data name="Explorer_None" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="Command_Refresh" xml:space="preserve">
+    <value>_Refresh</value>
+  </data>
   <data name="Explorer_Local" xml:space="preserve">
     <value>local</value>
     <comment>Location shown for a database opened without a server</comment>

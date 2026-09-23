@@ -71,4 +71,17 @@ public sealed class EmbeddedDatabaseTests : IDisposable
         Assert.True(error.Message.Contains(fileName, StringComparison.OrdinalIgnoreCase),
             $"Expected the error to name {fileName}. Message: {error.Message}");
     }
+
+    [Fact]
+    public void ListObjects_NewDatabase_HasNoUserObjectsButHasSystemTables()
+    {
+        using var connection = DatabaseConnection.Create(Local);
+
+        Assert.Empty(connection.ListObjects(DatabaseObjectType.Table, includeSystem: false));
+
+        var system = connection.ListObjects(DatabaseObjectType.Table, includeSystem: true);
+        var relations = Assert.Single(system, o => o.Name == "RDB$RELATIONS");
+        Assert.True(relations.IsSystem);
+        Assert.Equal(DatabaseObjectType.Table, relations.Type);
+    }
 }

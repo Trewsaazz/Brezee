@@ -5,8 +5,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Brezee.App.Features.Explorer;
 
-// One database in the explorer: a saved connection, an open connection, or both.
-public sealed partial class DatabaseNodeViewModel : ObservableObject
+// One database in the explorer: a saved connection, an open connection, or both. While connected,
+// its children are the object folders (Tables, Views, ...).
+public sealed partial class DatabaseNodeViewModel : ExplorerNode
 {
     public DatabaseNodeViewModel(SavedConnection? saved, ActiveConnection? active)
     {
@@ -26,6 +27,8 @@ public sealed partial class DatabaseNodeViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Name), nameof(Location), nameof(IsConnected), nameof(Status), nameof(Details))]
     public partial ActiveConnection? Active { get; set; }
+
+    public override DatabaseNodeViewModel Database => this;
 
     public bool IsSaved => Saved is not null;
 
@@ -54,6 +57,20 @@ public sealed partial class DatabaseNodeViewModel : ObservableObject
     // The server version when connected, otherwise "connecting…" or "not connected".
     public string Status => Active?.Session.Details.ServerVersion
         ?? (IsConnecting ? Strings.Explorer_Connecting : Strings.Explorer_NotConnected);
+
+    partial void OnActiveChanged(ActiveConnection? value)
+    {
+        Children.Clear();
+        if (value is null)
+        {
+            IsExpanded = false;
+            return;
+        }
+
+        foreach (var type in ObjectFolderNode.Order)
+            Children.Add(new ObjectFolderNode(this, value.Session, type));
+        IsExpanded = true;
+    }
 
     // Tooltip: the full path plus server details when connected.
     public string Details

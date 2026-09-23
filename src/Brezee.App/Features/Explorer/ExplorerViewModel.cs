@@ -36,9 +36,20 @@ public sealed partial class ExplorerViewModel : ToolViewModel
 
     public ObservableCollection<DatabaseNodeViewModel> Databases { get; } = [];
 
+    // The node selected in the tree (set by the view).
+    [ObservableProperty]
+    public partial ExplorerNode? SelectedNode { get; set; }
+
+    // The database the selection belongs to; the target of Connect, Disconnect, ...
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ConnectCommand), nameof(DisconnectCommand), nameof(RemoveCommand), nameof(ForgetPasswordCommand))]
     public partial DatabaseNodeViewModel? SelectedDatabase { get; set; }
+
+    partial void OnSelectedNodeChanged(ExplorerNode? value)
+    {
+        if (value is not null)
+            SelectedDatabase = value.Database;
+    }
 
     public bool HasDatabases => Databases.Count > 0;
 

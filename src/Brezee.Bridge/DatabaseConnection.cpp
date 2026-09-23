@@ -3,6 +3,7 @@
 #include "Interop.h"
 
 #include <brezee/core/connection.h>
+#include <brezee/core/metadata.h>
 
 namespace {
 
@@ -94,6 +95,41 @@ DatabaseDetails^ DatabaseConnection::GetDetails()
         details->PageSize = info.page_size;
         details->SqlDialect = info.sql_dialect;
         return details;
+    }
+    catch (const std::exception& e)
+    {
+        throw ToManagedException(e);
+    }
+}
+
+System::Collections::Generic::IReadOnlyList<DatabaseObjectInfo^>^ DatabaseConnection::ListObjects(
+    DatabaseObjectType type, bool includeSystem)
+{
+    if (_connection == nullptr)
+        throw gcnew System::ObjectDisposedException("DatabaseConnection");
+
+    try
+    {
+        const auto objects = brezee::core::list_objects(
+            *_connection, static_cast<brezee::core::ObjectType>(static_cast<int>(type)), includeSystem);
+
+        auto result = gcnew System::Collections::Generic::List<DatabaseObjectInfo^>(static_cast<int>(objects.size()));
+        for (const auto& object : objects)
+        {
+            auto flags = gcnew System::Collections::Generic::List<System::String^>();
+            for (const auto& flag : object.flags)
+                flags->Add(Interop::ToManaged(flag));
+
+            auto info = gcnew DatabaseObjectInfo();
+            info->Type = type;
+            info->Name = Interop::ToManaged(object.name);
+            info->Parent = Interop::ToManaged(object.parent);
+            info->Description = Interop::ToManaged(object.description);
+            info->IsSystem = object.is_system;
+            info->Flags = flags->AsReadOnly();
+            result->Add(info);
+        }
+        return result->AsReadOnly();
     }
     catch (const std::exception& e)
     {

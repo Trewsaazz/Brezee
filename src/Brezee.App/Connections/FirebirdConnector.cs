@@ -28,6 +28,10 @@ public sealed class FirebirdConnector : IDatabaseConnector
 
         public DatabaseDetails Details { get; } = details;
 
+        public Task<IReadOnlyList<DatabaseObjectInfo>> ListObjectsAsync(
+            DatabaseObjectType type, bool includeSystem = false, CancellationToken cancellationToken = default) =>
+            Task.Run(() => connection.ListObjects(type, includeSystem), cancellationToken);
+
         public void Dispose() => connection.Dispose();
     }
 }

@@ -23,6 +23,38 @@ public sealed class FakeSession(string database = "C:/data/employee.fdb", string
 
     public bool ThrowOnDispose { get; init; }
 
+    // Objects served by ListObjectsAsync, per type. Types not listed have none.
+    public Dictionary<DatabaseObjectType, List<DatabaseObjectInfo>> Objects { get; } = [];
+
+    // When set, ListObjectsAsync fails with this.
+    public Exception? ListFailure { get; set; }
+
+    public int ListCalls { get; private set; }
+
+    public Task<IReadOnlyList<DatabaseObjectInfo>> ListObjectsAsync(
+        DatabaseObjectType type, bool includeSystem = false, CancellationToken cancellationToken = default)
+    {
+        ListCalls++;
+        if (ListFailure is not null)
+            return Task.FromException<IReadOnlyList<DatabaseObjectInfo>>(ListFailure);
+
+        IReadOnlyList<DatabaseObjectInfo> objects = Objects.TryGetValue(type, out var list) ? list.ToList() : [];
+        return Task.FromResult(objects);
+    }
+
+    public FakeSession WithObjects(DatabaseObjectType type, params string[] names)
+    {
+        Objects[type] = names.Select(name => new DatabaseObjectInfo
+        {
+            Type = type,
+            Name = name,
+            Parent = string.Empty,
+            Description = string.Empty,
+            Flags = [],
+        }).ToList();
+        return this;
+    }
+
     public void Dispose()
     {
         DisposeCount++;

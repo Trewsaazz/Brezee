@@ -29,6 +29,39 @@ public:
     property System::String^ Charset;
 };
 
+// Mirrors brezee::core::ObjectType.
+public enum class DatabaseObjectType
+{
+    Table,
+    View,
+    Procedure,
+    Function,
+    Package,
+    Trigger,
+    Generator,
+    Domain,
+    Exception,
+    Role,
+    Index,
+};
+
+// One database object. Mirrors brezee::core::DatabaseObject.
+public ref class DatabaseObjectInfo sealed
+{
+public:
+    property DatabaseObjectType Type;
+    property System::String^ Name;
+
+    // The table or view an index or trigger belongs to; empty otherwise.
+    property System::String^ Parent;
+
+    property System::String^ Description;
+    property bool IsSystem;
+
+    // E.g. "unique", "inactive", "global temporary", "legacy UDF".
+    property System::Collections::Generic::IReadOnlyList<System::String^>^ Flags;
+};
+
 // Facts about an open database. Mirrors brezee::core::DatabaseInfo.
 public ref class DatabaseDetails sealed
 {
@@ -58,6 +91,9 @@ public:
     property bool IsOpen { bool get(); }
 
     DatabaseDetails^ GetDetails();
+
+    // Lists the objects of one type, ordered by name; system objects only if asked for.
+    System::Collections::Generic::IReadOnlyList<DatabaseObjectInfo^>^ ListObjects(DatabaseObjectType type, bool includeSystem);
 
     // Disconnects, reporting errors as CoreException.
     void Close();

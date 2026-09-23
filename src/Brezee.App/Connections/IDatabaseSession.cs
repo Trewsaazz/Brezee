@@ -8,6 +8,10 @@ public interface IDatabaseSession : IDisposable
     ConnectionSettings Settings { get; }
 
     DatabaseDetails Details { get; }
+
+    // Lists the objects of one type without blocking the UI. Throws CoreException on failure.
+    Task<IReadOnlyList<DatabaseObjectInfo>> ListObjectsAsync(
+        DatabaseObjectType type, bool includeSystem = false, CancellationToken cancellationToken = default);
 }
 
 // Opens database sessions. Abstracted so view models can be tested without a Firebird server.
