@@ -116,6 +116,25 @@ TEST_CASE("every supported type is read exactly")
     CHECK(result.columns[18].kind == ColumnKind::Binary);
 }
 
+TEST_CASE("table columns report their declared precision")
+{
+    TestDatabase db;
+    auto& c = *db.connection;
+    c.execute("create domain d_price as decimal(7,3)");
+    c.execute("create table prices (amount numeric(10,2), unit_price d_price, total numeric(18,4))");
+
+    const auto result = c.execute("select amount, unit_price, total, amount * 2 as doubled from prices");
+
+    CHECK(result.columns[0].type == "NUMERIC(10,2)");
+    CHECK(result.columns[1].type == "DECIMAL(7,3)");
+    CHECK(result.columns[2].type == "NUMERIC(18,4)");
+    // An expression has no declared type; its storage precision is the best available (Firebird 4+
+    // computes it in 128 bits, so NUMERIC(38,2)).
+    CHECK(result.columns[3].relation.empty());
+    CHECK(result.columns[3].type.rfind("NUMERIC(", 0) == 0);
+    CHECK(result.columns[3].type != "NUMERIC(10,2)");
+}
+
 TEST_CASE("parameters are passed as text and converted by Firebird")
 {
     TestDatabase db;

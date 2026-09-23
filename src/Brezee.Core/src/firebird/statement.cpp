@@ -524,4 +524,31 @@ QueryResult run_statement(Firebird::IAttachment* attachment, std::string_view sq
     }
 }
 
+void refine_declared_types(Firebird::IAttachment* attachment, QueryResult& result)
+{
+    for (auto& column : result.columns)
+    {
+        const bool numeric = column.type.rfind("NUMERIC(", 0) == 0 || column.type.rfind("DECIMAL(", 0) == 0;
+        if (!numeric || column.relation.empty() || column.field.empty())
+            continue;
+
+        const auto lookup = run_statement(attachment,
+            "select f.rdb$field_precision from rdb$relation_fields rf "
+            "join rdb$fields f on f.rdb$field_name = rf.rdb$field_source "
+            "where rf.rdb$relation_name = ? and rf.rdb$field_name = ?",
+            {column.relation, column.field}, {});
+
+        if (lookup.rows.empty())
+            continue;
+        const auto* precision = std::get_if<std::int64_t>(&lookup.rows[0][0]);
+        if (!precision || *precision <= 0)
+            continue;
+
+        // "NUMERIC(18,2)" -> "NUMERIC(10,2)": keep the name and scale, replace the precision.
+        const auto open = column.type.find('(');
+        const auto comma = column.type.find(',');
+        column.type = column.type.substr(0, open + 1) + std::to_string(*precision) + column.type.substr(comma);
+    }
+}
+
 } // namespace brezee::core::firebird

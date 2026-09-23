@@ -234,7 +234,9 @@ QueryResult Connection::execute(std::string_view sql, const Parameters& paramete
     if (!impl_->attachment)
         throw Error(ErrorKind::InvalidArgument, "The connection is closed.");
 
-    return firebird::run_statement(impl_->attachment, sql, parameters, options);
+    auto result = firebird::run_statement(impl_->attachment, sql, parameters, options);
+    firebird::refine_declared_types(impl_->attachment, result);
+    return result;
 }
 
 void Connection::close()
