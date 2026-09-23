@@ -41,12 +41,16 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\..\src\Brezee.Core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <!-- doctest's own forward declaration of std::ostream clashes with MSVC's <string_view>. -->
+      <PreprocessorDefinitions>DOCTEST_CONFIG_USE_STD_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="error_tests.cpp" />
+    <ClCompile Include="log_tests.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="version_tests.cpp" />
   </ItemGroup>
