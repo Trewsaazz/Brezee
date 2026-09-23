@@ -31,12 +31,12 @@ Nothing here is set in stone — phases can reorder, and some items may get cut 
 - [x] Saved connections / database registration (alias list, like a bookmarks panel)
 - [x] Secure credential storage for saved passwords (Windows DPAPI, never plain text)
 - [x] Recent connections list
-- [ ] Multiple simultaneous database connections (tabs or separate windows)
+- [x] Multiple simultaneous database connections (tabs or separate windows)
 
 ## Phase 1 — Core Browsing & Data Editing
 
 - [x] Database Explorer — object tree for tables, views, stored procedures, functions, packages, triggers, generators/sequences, domains, exceptions, roles, indices
-- [ ] Table data grid — browse, sort, filter rows
+- [x] Table data grid — browse, sort, filter rows
 - [ ] Inline data editing (insert/update/delete rows) with commit/rollback
 - [ ] Blob viewer/editor (text, image, binary preview)
 - [ ] Visual editors for creating/altering objects without hand-writing DDL: tables, fields, views, indices, domains, exceptions, generators
