@@ -59,6 +59,7 @@
     <ClCompile Include="error_tests.cpp" />
     <ClCompile Include="log_tests.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="query_tests.cpp" />
     <ClCompile Include="version_tests.cpp" />
   </ItemGroup>
   <ItemGroup>

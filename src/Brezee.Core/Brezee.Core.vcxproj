@@ -48,13 +48,16 @@
     <ClInclude Include="include\brezee\core\connection.h" />
     <ClInclude Include="include\brezee\core\error.h" />
     <ClInclude Include="include\brezee\core\log.h" />
+    <ClInclude Include="include\brezee\core\query.h" />
     <ClInclude Include="include\brezee\core\runtime.h" />
     <ClInclude Include="include\brezee\core\version.h" />
     <ClInclude Include="src\firebird\client.h" />
+    <ClInclude Include="src\firebird\statement.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\firebird\client.cpp" />
+    <ClCompile Include="src\firebird\statement.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\runtime.cpp" />
     <ClCompile Include="src\version.cpp" />

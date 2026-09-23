@@ -1,8 +1,11 @@
 #pragma once
 
+#include <brezee/core/query.h>
+
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 
 namespace brezee::core {
 
@@ -60,6 +63,12 @@ public:
 
     // Reads server and database details. Throws Error(Database) on failure.
     [[nodiscard]] DatabaseInfo info();
+
+    // Runs one SQL statement in its own transaction, committed if it succeeds. SELECTs return their
+    // rows; other statements return no columns. "?" placeholders take the parameters in order.
+    // Throws Error(Database) if Firebird rejects the statement, Error(InvalidArgument) if the
+    // parameter count does not match.
+    QueryResult execute(std::string_view sql, const Parameters& parameters = {}, const QueryOptions& options = {});
 
     // Detaches from the database. Throws Error(Database) if Firebird reports a problem.
     // Does nothing if already closed.

@@ -4,6 +4,7 @@
 #include <brezee/core/log.h>
 
 #include "firebird/client.h"
+#include "firebird/statement.h"
 
 #include <mutex>
 #include <string>
@@ -225,6 +226,15 @@ DatabaseInfo Connection::info()
     }
 
     return parse_info(buffer, sizeof(buffer));
+}
+
+QueryResult Connection::execute(std::string_view sql, const Parameters& parameters, const QueryOptions& options)
+{
+    std::lock_guard lock(impl_->mutex);
+    if (!impl_->attachment)
+        throw Error(ErrorKind::InvalidArgument, "The connection is closed.");
+
+    return firebird::run_statement(impl_->attachment, sql, parameters, options);
 }
 
 void Connection::close()
