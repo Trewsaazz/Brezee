@@ -23,6 +23,7 @@
 [Why Brezee](#-why-brezee) •
 [Goals](#-goals) •
 [Tech Stack](#%EF%B8%8F-tech-stack) •
+[Building](#-building) •
 [Status](#-project-status) •
 [Contributing](#-contributing) •
 [License](#-license)
@@ -96,12 +97,47 @@ detailed plan lives in the [roadmap](roadmap.md), and this section will grow as 
 
 ## 🛠️ Tech Stack
 
-| Layer          | Technology                                    |
-| -------------- | --------------------------------------------- |
-| **Core**       | C++                                           |
-| **UI**         | WPF (Windows Presentation Foundation)         |
-| **Database**   | Firebird SQL                                  |
-| **Build**      | CMake                                         |
+| Layer          | Technology                                              |
+| -------------- | ------------------------------------------------------- |
+| **Core**       | Native C++20: all database logic, no .NET dependencies  |
+| **Bridge**     | C++/CLI: a thin managed wrapper around the core         |
+| **UI**         | WPF on .NET 10                                          |
+| **Database**   | Firebird SQL 3.0 and newer                              |
+| **Build**      | Visual Studio 2026 / MSBuild, GitHub Actions CI         |
+
+```
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│   Brezee.App     │ ──▶ │  Brezee.Bridge   │ ──▶ │   Brezee.Core    │ ──▶  Firebird
+│   WPF · C#       │     │  C++/CLI         │     │   native C++20   │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+```
+
+---
+
+## 🔨 Building
+
+> [!IMPORTANT]
+> WPF and C++/CLI are Windows-only, so Brezee builds and runs on **Windows 10/11 (x64)**.
+
+**Requirements**
+
+- [Visual Studio 2026](https://visualstudio.microsoft.com/) with these workloads:
+  - *Desktop development with C++*, plus the **C++/CLI support** component
+  - *.NET desktop development*
+- .NET 10 SDK (included with Visual Studio)
+
+**Build**
+
+Open `Brezee.sln` in Visual Studio, select the `x64` platform, and press <kbd>F5</kbd>.
+
+Or build from a *Developer PowerShell for VS 2026*:
+
+```powershell
+msbuild Brezee.sln -restore -p:Configuration=Release -p:Platform=x64
+```
+
+Every push is also built by [GitHub Actions](.github/workflows/build.yml), which uploads a
+ready-to-run build as an artifact.
 
 ---
 
@@ -111,8 +147,8 @@ detailed plan lives in the [roadmap](roadmap.md), and this section will grow as 
 > Brezee is in **early development** and is not ready for use yet. Things will change quickly,
 > and nothing is stable.
 
-Progress is tracked task by task in the [roadmap](roadmap.md). Build instructions, screenshots,
-and usage guides will be added here as the project takes shape.
+Progress is tracked task by task in the [roadmap](roadmap.md). Screenshots and usage guides
+will be added here as the project takes shape.
 
 ---
 

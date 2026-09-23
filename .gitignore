@@ -67,3 +67,28 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Visual Studio / MSBuild
+.vs/
+*.user
+*.suo
+bin/
+obj/
+x64/
+[Dd]ebug/
+[Rr]elease/
+*.VC.db
+*.VC.opendb
+*.ipch
+*.tlog
+*.lastbuildstate
+*.idb
+*.exp
+
+# NuGet
+packages/
+*.nupkg
+
+# Rider / VS Code
+.idea/
+.vscode/
